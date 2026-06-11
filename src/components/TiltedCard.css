@@ -1,0 +1,42 @@
+.tilted-card-figure {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  perspective: 900px;
+}
+
+.tilted-card-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.tilted-card-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.tilted-card-light {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background: linear-gradient(125deg, rgba(255,255,255,.12), transparent 38%, rgba(255,53,38,.08));
+  opacity: 0;
+  transform: translateZ(18px);
+  transition: opacity .55s ease;
+}
+
+.project-card:hover .tilted-card-light {
+  opacity: 1;
+}
+
+@media (hover:none), (prefers-reduced-motion:reduce) {
+  .tilted-card-inner {
+    transform: none !important;
+  }
+}

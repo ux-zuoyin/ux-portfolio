@@ -1,11 +1,12 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { AlertCircle, ArrowUpRight, Check, MessageCircle, Phone, Sparkles } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowUp, ArrowUpRight, Check, MessageCircle, Phone, Sparkles } from 'lucide-react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
 import BorderGlow from './components/BorderGlow'
 import TextType from './components/TextType'
+import TiltedCard from './components/TiltedCard'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -19,6 +20,9 @@ const projects = [
     description: '从“不敢发”到“发得好”，以心智破冰、联想写作与确定性反馈重构内容发布体验。',
     image: assetUrl('project-01.png'),
     accent: '#ff3526',
+    detailTitle: '发布器 AI 辅助发帖',
+    detailSubtitle: '实现从「不敢发」到「发得好」的体验跃迁',
+    detailMedia: Array.from({ length: 8 }, (_, index) => assetUrl(`project-01/1-${index + 1}.png`)),
   },
   {
     index: '02',
@@ -27,6 +31,7 @@ const projects = [
     description: '在商业效率与社区体验之间建立平衡，搭建可持续演进的广告产品体验框架。',
     image: assetUrl('project-02.png'),
     accent: '#ff3526',
+    detailMedia: Array.from({ length: 7 }, (_, index) => assetUrl(`project-02/2-${index + 1}.png`)),
   },
   {
     index: '03',
@@ -35,6 +40,7 @@ const projects = [
     description: '围绕任务、激励与转化链路，推动单次运营活动升级为可复用的平台能力。',
     image: assetUrl('project-03.png'),
     accent: '#ff3526',
+    detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.png`)),
   },
   {
     index: '04',
@@ -43,6 +49,27 @@ const projects = [
     description: '打通 3D 资产生产、审核、配置与投放流程，提升跨角色协同和内容交付效率。',
     image: assetUrl('project-04.png'),
     accent: '#ff3526',
+    detailMedia: [
+      '1.png',
+      '2.png',
+      '3.png',
+      '4.png',
+      '5.gif',
+      '6.gif',
+      '7-1.gif',
+      '7-2.gif',
+      '8.gif',
+      '9-0.gif',
+      '9-1.gif',
+      '9-2.gif',
+      '9-3.gif',
+      '9-4.gif',
+      '10.gif',
+      '11.gif',
+      '12.gif',
+      '13.gif',
+      '14.png',
+    ].map((file) => assetUrl(`project-04/${file}`)),
   },
   {
     index: '05',
@@ -51,6 +78,7 @@ const projects = [
     description: '打通工单处理、投诉收集与需求流转流程，沉淀用户一线反馈数据，支撑问题分析、功能迭代及效果验证，提升跨团队协同与产品优化效率。',
     image: assetUrl('project-05.png'),
     accent: '#ff3526',
+    detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-05/${index + 1}.gif`)),
   },
   {
     index: '06',
@@ -59,6 +87,7 @@ const projects = [
     description: '构建 0 代码活动搭投平台，支持 H5 页面可视化搭建、组件化配置与快速发布，实现活动资产标准化管理。缩短活动上线周期，提升运营自主性与投放效率。',
     image: assetUrl('project-06.png'),
     accent: '#ff3526',
+    detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.gif`)),
   },
 ]
 
@@ -79,7 +108,7 @@ function Nav() {
   </header>
 }
 
-function App() {
+function HomePage() {
   const heroVideoRef = useRef(null)
   const appRef = useRef(null)
   const toastTimerRef = useRef(null)
@@ -286,16 +315,23 @@ function App() {
         <div className="section-heading"><h2>六个项目，六种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2023 — 2026</p></div>
         <div className="project-list">
           {projects.map((p) => <BorderGlow className="project-glow" key={p.index} data-stagger-item>
-            <article className="project-card" style={{'--accent': p.accent}}>
+            <a className="project-card project-link" href={`#project-${p.index}`} style={{'--accent': p.accent}} aria-label={`查看项目：${p.title.replace('\n', ' ')}`}>
               <div className="project-cover">
-                <div className="project-media"><img src={p.image} alt={p.title.replace('\n', ' ')}/></div>
+                <div className="project-media">
+                  <TiltedCard
+                    imageSrc={p.image}
+                    altText={p.title.replace('\n', ' ')}
+                    rotateAmplitude={5}
+                    scaleOnHover={1.1}
+                  />
+                </div>
               </div>
               <div className="project-info">
                 <div className="project-top"><span>{p.index}</span><span>{p.meta}</span></div>
                 <div className="project-content"><h3>{p.title.split('\n').map((line,i)=><React.Fragment key={line}>{line}{i===0&&<br/>}</React.Fragment>)}</h3><p>{p.description}</p></div>
                 <div className="project-arrow"><ArrowUpRight/></div>
               </div>
-            </article>
+            </a>
           </BorderGlow>)}
         </div>
       </div>
@@ -327,6 +363,106 @@ function App() {
       {toastSuccess ? <Check size={17}/> : <AlertCircle size={17}/>}<span>{toastMessage}</span>
     </div>
   </main>
+}
+
+function ProjectDetail({ project }) {
+  const detailRef = useRef(null)
+  const projectIndex = projects.findIndex((item) => item.index === project.index)
+  const previousProject = projects[(projectIndex - 1 + projects.length) % projects.length]
+  const nextProject = projects[(projectIndex + 1) % projects.length]
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const context = gsap.context(() => {
+      const timeline = gsap.timeline({ defaults: { ease: 'power4.out' } })
+      timeline
+        .fromTo('.detail-nav', { y: -28, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, 0.2)
+        .fromTo('.detail-carousel', { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 1.25 }, 0.45)
+        .fromTo('.detail-current .detail-cover-card', { clipPath: 'inset(0 100% 0 0)', scale: 1.06 }, { clipPath: 'inset(0 0% 0 0)', scale: 1, duration: 1.4 }, 0.65)
+        .fromTo('.detail-current .detail-slide-copy', { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 1.1 }, 0.95)
+
+      gsap.utils.toArray('.detail-media-item').forEach((item) => {
+        gsap.fromTo(item, { y: 100, opacity: 0, clipPath: 'inset(0 0 18% 0)' }, {
+          y: 0,
+          opacity: 1,
+          clipPath: 'inset(0 0 0% 0)',
+          duration: 1.25,
+          ease: 'power4.out',
+          scrollTrigger: { trigger: item, start: 'top 82%', once: true },
+        })
+      })
+    }, detailRef)
+
+    return () => context.revert()
+  }, [project.index])
+
+  return <main className="project-detail" ref={detailRef}>
+    <section className="detail-hero">
+      <header className="detail-nav shell">
+        <a className="brand" href="#work"><span>SD</span> SARDINE DESIGN</a>
+        <a className="detail-back" href="#work"><ArrowLeft size={16}/> 返回项目列表</a>
+      </header>
+      <div className="detail-carousel" aria-label="项目切换">
+        <a className="detail-slide detail-side detail-previous" href={`#project-${previousProject.index}`} aria-label={`上一个项目：${previousProject.title.replace('\n', ' ')}`}>
+          <img src={previousProject.image} alt=""/>
+          <div><strong>{previousProject.title.split('\n')[0]}</strong><span>{previousProject.meta}</span></div>
+        </a>
+        <article className="detail-slide detail-current">
+          <div className="detail-cover-card"><img src={project.image} alt={`${project.title.replace('\n', ' ')}封面`}/></div>
+          <div className="detail-slide-copy">
+            <div className="detail-kicker">PROJECT {project.index} / {project.meta}</div>
+            <h1>{(project.detailTitle || project.title.replace('\n', ' ')).split(' ').map((part) => <span className="detail-title-mask" key={part}><span className="detail-title-line">{part}</span></span>)}</h1>
+            <p className="detail-subtitle">{project.detailSubtitle || project.description}</p>
+          </div>
+        </article>
+        <a className="detail-slide detail-side detail-next" href={`#project-${nextProject.index}`} aria-label={`下一个项目：${nextProject.title.replace('\n', ' ')}`}>
+          <img src={nextProject.image} alt=""/>
+          <div><strong>{nextProject.title.split('\n')[0]}</strong><span>{nextProject.meta}</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section className="detail-body">
+      <div className="shell detail-intro">
+        <div className="section-label">CASE STUDY / OVERVIEW</div>
+        <div className="detail-intro-grid">
+          <h2>{project.title.split('\n').map((line) => <React.Fragment key={line}>{line}<br/></React.Fragment>)}</h2>
+          <p>{project.description}</p>
+        </div>
+      </div>
+      <div className="shell detail-media-stack">
+        {(project.detailMedia || [project.image]).map((media, index) => <figure className="detail-media-item" key={media}>
+          {media.toLowerCase().endsWith('.gif')
+            ? <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`}/>
+            : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`}/>}
+        </figure>)}
+      </div>
+    </section>
+    <button
+      className="back-to-top"
+      type="button"
+      aria-label="回到顶部"
+      title="回到顶部"
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+    >
+      <ArrowUp size={22}/>
+    </button>
+  </main>
+}
+
+function App() {
+  const getProjectFromHash = () => projects.find((project) => window.location.hash === `#project-${project.index}`)
+  const [activeProject, setActiveProject] = useState(getProjectFromHash)
+
+  useEffect(() => {
+    const handleHashChange = () => setActiveProject(getProjectFromHash())
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
+  return activeProject ? <ProjectDetail project={activeProject}/> : <HomePage/>
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />)

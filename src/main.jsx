@@ -7,6 +7,7 @@ import './styles.css'
 import BorderGlow from './components/BorderGlow'
 import TextType from './components/TextType'
 import TiltedCard from './components/TiltedCard'
+import TargetCursor from './components/TargetCursor'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -22,7 +23,10 @@ const projects = [
     accent: '#ff3526',
     detailTitle: '发布器 AI 辅助发帖',
     detailSubtitle: '实现从「不敢发」到「发得好」的体验跃迁',
-    detailMedia: Array.from({ length: 8 }, (_, index) => assetUrl(`project-01/1-${index + 1}.png`)),
+    detailMedia: Array.from({ length: 8 }, (_, index) => {
+      const number = index + 1
+      return assetUrl(`project-01/1-${number}.${[5, 6].includes(number) ? 'webp' : 'png'}`)
+    }),
   },
   {
     index: '02',
@@ -31,7 +35,10 @@ const projects = [
     description: '在商业效率与社区体验之间建立平衡，搭建可持续演进的广告产品体验框架。',
     image: assetUrl('project-02.png'),
     accent: '#ff3526',
-    detailMedia: Array.from({ length: 7 }, (_, index) => assetUrl(`project-02/2-${index + 1}.png`)),
+    detailMedia: Array.from({ length: 7 }, (_, index) => {
+      const number = index + 1
+      return assetUrl(`project-02/2-${number}.${number === 6 ? 'webp' : 'png'}`)
+    }),
   },
   {
     index: '03',
@@ -40,7 +47,7 @@ const projects = [
     description: '围绕任务、激励与转化链路，推动单次运营活动升级为可复用的平台能力。',
     image: assetUrl('project-03.png'),
     accent: '#ff3526',
-    detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.png`)),
+    detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.${index === 12 ? 'webp' : 'png'}`)),
   },
   {
     index: '04',
@@ -53,7 +60,7 @@ const projects = [
       '1.png',
       '2.png',
       '3.png',
-      '4.png',
+      '4.webp',
       '5.mp4',
       '6.mp4',
       '7-1.mp4',
@@ -99,13 +106,25 @@ const capabilities = [
 ]
 
 function Nav() {
-  return <header className="nav shell">
-    <a className="brand" href="#top"><span>SD</span> SARDINE DESIGN</a>
-    <nav>
-      <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × 6</a><a href="#strength">个人优势</a>
-    </nav>
-    <a className="nav-contact" href="#contact">联系我 <ArrowUpRight size={16}/></a>
-  </header>
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const updateNav = () => setIsScrolled(window.scrollY > 80)
+    updateNav()
+    window.addEventListener('scroll', updateNav, { passive: true })
+    return () => window.removeEventListener('scroll', updateNav)
+  }, [])
+
+  return <>
+    <header className={`nav shell${isScrolled ? ' nav-scrolled' : ''}`}>
+      <a className="brand" href="#top">SARDINE DESIGN</a>
+      <nav>
+        <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × 6</a><a href="#strength">个人优势</a>
+      </nav>
+      <a className="nav-contact" href="#contact">联系我 <ArrowUpRight size={16}/></a>
+    </header>
+    <div className="nav-spacer" aria-hidden="true"/>
+  </>
 }
 
 function HomePage() {
@@ -199,19 +218,19 @@ function HomePage() {
 
       opening
         .set('.nav, .hero-eyebrow-mask, .hero-title-mask, .hero-subtitle-mask, .hero-actions', { visibility: 'visible' })
-        .fromTo('.opening-mark', { yPercent: 130, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 1 }, 0.15)
-        .fromTo('.opening-line', { scaleX: 0 }, { scaleX: 1, duration: 1.15 }, 0.25)
-        .to('.opening-mark', { yPercent: -80, opacity: 0, duration: 0.65, ease: 'power3.in' }, 1.3)
-        .to('.opening-curtain', { yPercent: -101, duration: 1.45, ease: 'power4.inOut' }, 1.45)
-        .fromTo('.hero-media', { scale: 1.14 }, { scale: 1, duration: 2.4 }, 1.45)
-        .fromTo('.nav', { y: -34, opacity: 0 }, { y: 0, opacity: 1, duration: 1.15 }, 1.9)
-        .fromTo('.hero-eyebrow-mask .eyebrow', { yPercent: 120 }, { yPercent: 0, duration: 1 }, 2.05)
-        .fromTo('.hero-title-mask', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.5 }, 2.15)
-        .fromTo('.hero-main-title', { y: 100, scaleX: 0.72, transformOrigin: '50% 50%' }, { y: 0, scaleX: 1, duration: 1.65 }, 2.15)
-        .set('.hero-title-mask', { overflow: 'visible' }, 3.85)
-        .to('.hero-main-title', { y: -18, scale: 0.84, duration: 1.15, ease: 'power4.inOut' }, 4.4)
-        .fromTo('.hero-subtitle-mask', { clipPath: 'inset(0 0 100% 0)', y: 28, opacity: 0 }, { clipPath: 'inset(0 0 0% 0)', y: 0, opacity: 1, duration: 1.05 }, 4.65)
-        .fromTo('.hero-actions', { y: 42, opacity: 0 }, { y: 0, opacity: 1, duration: 1.05 }, 5.25)
+        .fromTo('.opening-mark', { yPercent: 130, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.75 }, 0.1)
+        .fromTo('.opening-line', { scaleX: 0 }, { scaleX: 1, duration: 0.9 }, 0.18)
+        .to('.opening-mark', { yPercent: -80, opacity: 0, duration: 0.5, ease: 'power3.in' }, 0.95)
+        .to('.opening-curtain', { yPercent: -101, duration: 1.15, ease: 'power4.inOut' }, 1.08)
+        .fromTo('.hero-media', { scale: 1.1 }, { scale: 1, duration: 1.9 }, 1.08)
+        .fromTo('.nav', { y: -24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, 1.42)
+        .fromTo('.hero-eyebrow-mask .eyebrow', { yPercent: 100 }, { yPercent: 0, duration: 0.75 }, 1.55)
+        .fromTo('.hero-title-mask', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.1 }, 1.65)
+        .fromTo('.hero-main-title', { y: 72, scaleX: 0.8, transformOrigin: '50% 50%' }, { y: 0, scaleX: 1, duration: 1.2 }, 1.65)
+        .set('.hero-title-mask', { overflow: 'visible' }, 2.9)
+        .to('.hero-main-title', { y: -18, scale: 0.84, duration: 0.8, ease: 'power4.inOut' }, 3.05)
+        .fromTo('.hero-subtitle-mask', { clipPath: 'inset(0 0 100% 0)', y: 20, opacity: 0 }, { clipPath: 'inset(0 0 0% 0)', y: 0, opacity: 1, duration: 0.8 }, 3.25)
+        .fromTo('.hero-actions', { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 3.65)
 
       gsap.utils.toArray('[data-motion-section]').forEach((section) => {
         const title = section.querySelector('.motion-title')
@@ -229,17 +248,24 @@ function HomePage() {
         })
 
         if (title) {
-          timeline.fromTo(title,
-            { xPercent: section.classList.contains('strength') ? 22 : -22, scaleX: 0.72, opacity: 0 },
-            { xPercent: 0, scaleX: 1, opacity: 1, duration: 1.55 },
-          )
+          if (section.classList.contains('experience-section')) {
+            timeline.fromTo(title,
+              { y: 28, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.9 },
+            )
+          } else {
+            timeline.fromTo(title,
+              { xPercent: section.classList.contains('strength') ? 22 : -22, scaleX: 0.72, opacity: 0 },
+              { xPercent: 0, scaleX: 1, opacity: 1, duration: 1.55 },
+            )
+          }
         }
         if (heading) timeline.fromTo(heading, { y: 44, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, '-=0.8')
         if (intro) timeline.fromTo(intro, { y: 72, opacity: 0 }, { y: 0, opacity: 1, duration: 1.15 }, '-=0.65')
         if (cards.length) {
           timeline.fromTo(cards,
-            { y: 110, opacity: 0, clipPath: 'inset(0 0 24% 0)' },
-            { y: 0, opacity: 1, clipPath: 'inset(0 0 0% 0)', duration: 1.2, stagger: 0.13 },
+            { y: 64, opacity: 0, clipPath: 'inset(0 0 14% 0)' },
+            { y: 0, opacity: 1, clipPath: 'inset(0 0 0% 0)', duration: 0.9, stagger: 0.1 },
             '-=0.65',
           )
         }
@@ -271,9 +297,9 @@ function HomePage() {
             <TextType
               as="p"
               className="hero-statement"
-              text="用设计思维与工程协同，让产品体验更可靠、更包容、更有竞争力"
-              initialDelay={4550}
-              variableSpeed={{ min: 38, max: 70 }}
+              text="用设计思维与AI工程协同，让创意更快成为真实可用的产品"
+              initialDelay={3500}
+              variableSpeed={{ min: 70, max: 110 }}
               loop={false}
               cursorCharacter="|"
               startOnVisible={false}
@@ -312,7 +338,7 @@ function HomePage() {
       <div className="shell">
         <div className="motion-title" aria-hidden="true">PROJECTS</div>
         <div className="section-label">02 / PROJECTS · 06</div>
-        <div className="section-heading"><h2>六个项目，六种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2023 — 2026</p></div>
+        <div className="section-heading"><h2>六个项目，六种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
         <div className="project-list">
           {projects.map((p) => <BorderGlow className="project-glow" key={p.index} data-stagger-item>
             <a className="project-card project-link" href={`#project-${p.index}`} style={{'--accent': p.accent}} aria-label={`查看项目：${p.title.replace('\n', ' ')}`}>
@@ -365,6 +391,25 @@ function HomePage() {
   </main>
 }
 
+function DetailVideo({ media, label }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) video.play().catch(() => {})
+      else video.pause()
+    }, { threshold: 0.15, rootMargin: '120px 0px' })
+
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
+
+  return <video ref={videoRef} src={media} aria-label={label} autoPlay loop muted playsInline preload="metadata"/>
+}
+
 function ProjectDetail({ project }) {
   const detailRef = useRef(null)
   const projectIndex = projects.findIndex((item) => item.index === project.index)
@@ -384,11 +429,11 @@ function ProjectDetail({ project }) {
         .fromTo('.detail-current .detail-slide-copy', { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 1.1 }, 0.95)
 
       gsap.utils.toArray('.detail-media-item').forEach((item) => {
-        gsap.fromTo(item, { y: 100, opacity: 0, clipPath: 'inset(0 0 18% 0)' }, {
+        gsap.fromTo(item, { y: 52, opacity: 0, clipPath: 'inset(0 0 10% 0)' }, {
           y: 0,
           opacity: 1,
           clipPath: 'inset(0 0 0% 0)',
-          duration: 1.25,
+          duration: 0.85,
           ease: 'power4.out',
           scrollTrigger: { trigger: item, start: 'top 82%', once: true },
         })
@@ -401,7 +446,7 @@ function ProjectDetail({ project }) {
   return <main className="project-detail" ref={detailRef}>
     <section className="detail-hero">
       <header className="detail-nav shell">
-        <a className="brand" href="#work"><span>SD</span> SARDINE DESIGN</a>
+        <a className="brand" href="#work">SARDINE DESIGN</a>
         <a className="detail-back" href="#work"><ArrowLeft size={16}/> 返回项目列表</a>
       </header>
       <div className="detail-carousel" aria-label="项目切换">
@@ -435,7 +480,7 @@ function ProjectDetail({ project }) {
       <div className="shell detail-media-stack">
         {(project.detailMedia || [project.image]).map((media, index) => <figure className="detail-media-item" key={media}>
           {media.toLowerCase().endsWith('.mp4')
-            ? <video src={media} aria-label={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`} autoPlay loop muted playsInline/>
+            ? <DetailVideo media={media} label={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`}/>
             : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`}/>} 
         </figure>)}
       </div>
@@ -462,7 +507,15 @@ function App() {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  return activeProject ? <ProjectDetail project={activeProject}/> : <HomePage/>
+  return <>
+    <TargetCursor
+      targetSelector="a, button, .project-card, .capability-grid article"
+      spinDuration={2}
+      hideDefaultCursor
+      parallaxOn
+    />
+    {activeProject ? <ProjectDetail project={activeProject}/> : <HomePage/>}
+  </>
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />)

@@ -9,13 +9,15 @@ import TextType from './components/TextType'
 
 gsap.registerPlugin(ScrollTrigger)
 
+const assetUrl = (file) => `${import.meta.env.BASE_URL}assets/${file}`
+
 const projects = [
   {
     index: '01',
     title: '构建全链路发布器\nAIGC 辅助体系',
     meta: 'SOUL APP · 2025–2026',
     description: '从“不敢发”到“发得好”，以心智破冰、联想写作与确定性反馈重构内容发布体验。',
-    image: '/assets/project-01.png',
+    image: assetUrl('project-01.png'),
     accent: '#ff3526',
   },
   {
@@ -23,7 +25,7 @@ const projects = [
     title: '多维场景下的商业适配\nSoul 广告生态设计',
     meta: 'SOUL APP · 2024–2025',
     description: '在商业效率与社区体验之间建立平衡，搭建可持续演进的广告产品体验框架。',
-    image: '/assets/project-02.png',
+    image: assetUrl('project-02.png'),
     accent: '#ff3526',
   },
   {
@@ -31,7 +33,7 @@ const projects = [
     title: '广告激励平台化\n从单点活动到玩法聚合',
     meta: '增长体验 · 2023–2024',
     description: '围绕任务、激励与转化链路，推动单次运营活动升级为可复用的平台能力。',
-    image: '/assets/project-03.png',
+    image: assetUrl('project-03.png'),
     accent: '#ff3526',
   },
   {
@@ -39,7 +41,7 @@ const projects = [
     title: '支撑 Soul 主站\n3D 资产全链路管控',
     meta: 'NAWA · EFFECTCREATOR',
     description: '打通 3D 资产生产、审核、配置与投放流程，提升跨角色协同和内容交付效率。',
-    image: '/assets/project-04.png',
+    image: assetUrl('project-04.png'),
     accent: '#ff3526',
   },
   {
@@ -47,7 +49,7 @@ const projects = [
     title: '支撑用户反馈平台\n用户声音统一运营中枢',
     meta: 'SOUL APP · CONTENT CREATION',
     description: '打通工单处理、投诉收集与需求流转流程，沉淀用户一线反馈数据，支撑问题分析、功能迭代及效果验证，提升跨团队协同与产品优化效率。',
-    image: '/assets/project-05.png',
+    image: assetUrl('project-05.png'),
     accent: '#ff3526',
   },
   {
@@ -55,7 +57,7 @@ const projects = [
     title: '支撑活动搭投\n0代码活动快速搭建',
     meta: 'SOUL APP · HARMONYOS',
     description: '构建 0 代码活动搭投平台，支持 H5 页面可视化搭建、组件化配置与快速发布，实现活动资产标准化管理。缩短活动上线周期，提升运营自主性与投放效率。',
-    image: '/assets/project-06.png',
+    image: assetUrl('project-06.png'),
     accent: '#ff3526',
   },
 ]
@@ -221,8 +223,8 @@ function App() {
 
   return <main id="top" ref={appRef}>
     <section className="hero">
-      <video ref={heroVideoRef} className="hero-media" autoPlay muted loop playsInline preload="auto" poster="/assets/hero-cover.png">
-        <source src="/assets/hero-video.mp4" type="video/mp4" />
+      <video ref={heroVideoRef} className="hero-media" autoPlay muted loop playsInline preload="auto" poster={assetUrl('hero-cover.png')}>
+        <source src={assetUrl('hero-video.mp4')} type="video/mp4" />
       </video>
       <div className="hero-shade" />
       <div className="hero-frost" />

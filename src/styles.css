@@ -80,3 +80,4 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 
 .project-detail .detail-body{background:#000}
 .project-detail .detail-body:before{display:none}
+.detail-media-item video{display:block;width:100%;height:auto}

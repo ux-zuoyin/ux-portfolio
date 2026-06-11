@@ -54,20 +54,20 @@ const projects = [
       '2.png',
       '3.png',
       '4.png',
-      '5.gif',
-      '6.gif',
-      '7-1.gif',
-      '7-2.gif',
-      '8.gif',
-      '9-0.gif',
-      '9-1.gif',
-      '9-2.gif',
-      '9-3.gif',
-      '9-4.gif',
-      '10.gif',
-      '11.gif',
-      '12.gif',
-      '13.gif',
+      '5.mp4',
+      '6.mp4',
+      '7-1.mp4',
+      '7-2.mp4',
+      '8.mp4',
+      '9-0.mp4',
+      '9-1.mp4',
+      '9-2.mp4',
+      '9-3.mp4',
+      '9-4.mp4',
+      '10.mp4',
+      '11.mp4',
+      '12.mp4',
+      '13.mp4',
       '14.png',
     ].map((file) => assetUrl(`project-04/${file}`)),
   },
@@ -78,7 +78,7 @@ const projects = [
     description: '打通工单处理、投诉收集与需求流转流程，沉淀用户一线反馈数据，支撑问题分析、功能迭代及效果验证，提升跨团队协同与产品优化效率。',
     image: assetUrl('project-05.png'),
     accent: '#ff3526',
-    detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-05/${index + 1}.gif`)),
+    detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-05/${index + 1}.mp4`)),
   },
   {
     index: '06',
@@ -87,7 +87,7 @@ const projects = [
     description: '构建 0 代码活动搭投平台，支持 H5 页面可视化搭建、组件化配置与快速发布，实现活动资产标准化管理。缩短活动上线周期，提升运营自主性与投放效率。',
     image: assetUrl('project-06.png'),
     accent: '#ff3526',
-    detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.gif`)),
+    detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.mp4`)),
   },
 ]
 
@@ -434,9 +434,9 @@ function ProjectDetail({ project }) {
       </div>
       <div className="shell detail-media-stack">
         {(project.detailMedia || [project.image]).map((media, index) => <figure className="detail-media-item" key={media}>
-          {media.toLowerCase().endsWith('.gif')
-            ? <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`}/>
-            : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`}/>}
+          {media.toLowerCase().endsWith('.mp4')
+            ? <video src={media} aria-label={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`} autoPlay loop muted playsInline/>
+            : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`}/>} 
         </figure>)}
       </div>
     </section>

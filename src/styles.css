@@ -124,3 +124,4 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .detail-media-item video{aspect-ratio:16/9;background:#0d0d0d}
 @media(max-width:800px){.project-tabs{padding-top:12px;padding-bottom:18px}.project-tabs button:first-child{margin-left:2px}.project-tabs button:last-child{margin-right:20px}.project-tab-badge{top:-11px;right:-7px}}
 @media(max-width:620px){.hero .hero-copy .hero-main-title{font-size:38px;line-height:1.15}.hero .hero-copy .hero-statement{font-size:15px;line-height:2;font-weight:600}.hero .hero-subtitle-mask{padding:0;text-align:left}.hero .hero-statement{width:100%;text-align:left}}
+@media(max-width:620px){.hero>.hero-content.shell{align-items:flex-start}.hero .hero-copy{align-items:flex-start;text-align:left}.hero .eyebrow{justify-content:flex-start;text-align:left}.hero-heading-stage{justify-content:flex-start}.hero-title-mask{justify-content:flex-start}.hero .hero-copy .hero-main-title{text-align:left}}

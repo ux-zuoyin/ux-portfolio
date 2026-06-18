@@ -346,7 +346,7 @@ function HomePage() {
       <Nav />
       <div className="hero-content shell">
         <div className="hero-copy">
-          <div className="hero-eyebrow-mask"><div className="eyebrow">AI PRODUCT DESIGN / UX EXPERIENCE / AGENT INTERACTION</div></div>
+          <div className="hero-eyebrow-mask"><div className="eyebrow">AI PRODUCT DESIGN / UX EXPERIENCE</div></div>
           <div className="hero-heading-stage">
             <div className="hero-title-mask"><h1 className="hero-main-title">Hi，我是左胤</h1></div>
             <div className="hero-subtitle-mask">

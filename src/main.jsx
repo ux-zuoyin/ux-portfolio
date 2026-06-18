@@ -12,6 +12,8 @@ gsap.registerPlugin(ScrollTrigger)
 
 const assetUrl = (file) => `${import.meta.env.BASE_URL}assets/${file}`
 
+const scrollToPageTop = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+
 const projectCategories = [
   '全部',
   'AI产品体验设计',
@@ -499,8 +501,11 @@ function ProjectDetail({ project }) {
   }, [])
 
   useLayoutEffect(() => {
-    window.scrollTo(0, 0)
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    scrollToPageTop()
+    const scrollResetFrame = window.requestAnimationFrame(scrollToPageTop)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return () => window.cancelAnimationFrame(scrollResetFrame)
+    }
 
     const context = gsap.context(() => {
       const timeline = gsap.timeline({ defaults: { ease: 'power4.out' } })
@@ -521,7 +526,10 @@ function ProjectDetail({ project }) {
       })
     }, detailRef)
 
-    return () => context.revert()
+    return () => {
+      window.cancelAnimationFrame(scrollResetFrame)
+      context.revert()
+    }
   }, [project.index])
 
   return <main className="project-detail" ref={detailRef}>
@@ -584,6 +592,12 @@ function App() {
   const getProjectFromHash = () => projects.find((project) => window.location.hash === `#project-${project.index}`)
   const [activeProject, setActiveProject] = useState(getProjectFromHash)
   const activeProjectIndexRef = useRef(activeProject?.index || null)
+
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+  }, [])
 
   useEffect(() => {
     const handleHashChange = () => {

@@ -105,9 +105,10 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .hero .hero-copy .hero-statement{font-size:20px;line-height:1.65}
 .hero .hero-subtitle-mask{top:112px}
 @media(max-width:620px){.hero .hero-copy .hero-statement{font-size:20px}.hero .hero-subtitle-mask{top:92px}}
-@media(min-width:621px){.hero-heading-stage{display:block;min-height:0}.hero .hero-subtitle-mask{position:static;margin-top:48px;width:min(980px,100%)}}
+@media(min-width:621px){.hero-heading-stage{display:block;min-height:0}.hero .hero-subtitle-mask{position:static;margin-top:24px;width:min(980px,100%)}}
 @media(min-width:621px){.hero>.hero-content.shell{justify-content:flex-end;padding-bottom:200px}.hero .hero-copy{margin-top:0}}
 .hero .hero-copy .hero-main-title{font-size:64px}
+@media(min-width:621px){.hero .hero-copy .hero-main-title{font-family:Inter,'Noto Sans SC',sans-serif;font-weight:700;line-height:1.15}}
 .hero-actions button{position:relative;height:50px;padding:0 20px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:9px;font:inherit;font-size:14px;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:transform .25s ease,background-color .25s ease,border-color .25s ease,box-shadow .25s ease}
 .hero-actions button:hover{transform:translateY(-3px)}
 .hero-actions .hero-primary{background:#ff3526;color:#fff;border:1px solid #ff3526}
@@ -121,3 +122,5 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .experience-intro h2,.section-heading h2,.contact h3,.detail-intro h2{font-size:64px}
 @media(max-width:620px){.experience-intro h2,.section-heading h2,.contact h3,.detail-intro h2{font-size:38px}}
 .detail-media-item video{aspect-ratio:16/9;background:#0d0d0d}
+@media(max-width:800px){.project-tabs{padding-top:12px;padding-bottom:18px}.project-tabs button:first-child{margin-left:2px}.project-tabs button:last-child{margin-right:20px}.project-tab-badge{top:-11px;right:-7px}}
+@media(max-width:620px){.hero .hero-copy .hero-main-title{font-size:38px;line-height:1.15}.hero .hero-copy .hero-statement{font-size:15px;line-height:2;font-weight:600}.hero .hero-subtitle-mask{padding:0;text-align:left}.hero .hero-statement{width:100%;text-align:left}}

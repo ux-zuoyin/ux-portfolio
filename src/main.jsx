@@ -5,7 +5,6 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
 import BorderGlow from './components/BorderGlow'
-import TextType from './components/TextType'
 import TiltedCard from './components/TiltedCard'
 import TargetCursor from './components/TargetCursor'
 
@@ -13,53 +12,96 @@ gsap.registerPlugin(ScrollTrigger)
 
 const assetUrl = (file) => `${import.meta.env.BASE_URL}assets/${file}`
 
+const projectCategories = [
+  '全部',
+  'AI产品体验设计',
+  '商业化与增长设计',
+  '创作者与生产力平台',
+]
+
+const createProjectTemplate = (index, overrides = {}) => {
+  const placeholderImage = assetUrl('project-placeholder.svg')
+  return {
+    index,
+    title: '新项目标题\n等待内容补充',
+    meta: 'NEW PROJECT · COMING SOON',
+    description: '这里是项目副标题占位内容，后续可替换为项目背景、目标与核心价值说明。',
+    tags: ['占位标签', '项目类型', '待补充'],
+    image: placeholderImage,
+    accent: '#ff3526',
+    detailTitle: '新项目内容准备中',
+    detailSubtitle: '项目详情将在内容整理完成后补充',
+    detailMedia: [placeholderImage],
+    category: 'AI产品体验设计',
+    ...overrides,
+  }
+}
+
 const projects = [
+  // 新增项目时复制此调用，并通过第二个参数覆盖标题、封面、标签及详情内容。
+  createProjectTemplate('01', {
+    title: '灵魂记忆空间\n基于 AI 记忆构建用户画像体系',
+    description: '从用户行为到社交连接，探索兴趣社交场景下的新一代 Persona System',
+    tags: ['AI记忆', '用户画像', '兴趣匹配'],
+    image: assetUrl('project-memory.webp'),
+    detailTitle: '灵魂记忆空间\n基于 AI 记忆构建用户画像体系',
+    detailSubtitle: '从用户行为到社交连接，探索兴趣社交场景下的新一代 Persona System',
+    detailMedia: Array.from({ length: 14 }, (_, index) => assetUrl(`project-memory/${index + 1}.webp`)),
+  }),
   {
-    index: '01',
+    index: '02',
     title: '构建全链路发布器\nAIGC 辅助体系',
     meta: 'SOUL APP · 2025–2026',
     description: '从“不敢发”到“发得好”，以心智破冰、联想写作与确定性反馈重构内容发布体验。',
-    image: assetUrl('project-01.png'),
+    tags: ['AIGC', '内容创作', '体验策略'],
+    image: assetUrl('project-01.webp'),
     accent: '#ff3526',
     detailTitle: '发布器 AI 辅助发帖',
     detailSubtitle: '实现从「不敢发」到「发得好」的体验跃迁',
+    category: 'AI产品体验设计',
     detailMedia: Array.from({ length: 8 }, (_, index) => {
       const number = index + 1
-      return assetUrl(`project-01/1-${number}.${[5, 6].includes(number) ? 'webp' : 'png'}`)
-    }),
-  },
-  {
-    index: '02',
-    title: '多维场景下的商业适配\nSoul 广告生态设计',
-    meta: 'SOUL APP · 2024–2025',
-    description: '在商业效率与社区体验之间建立平衡，搭建可持续演进的广告产品体验框架。',
-    image: assetUrl('project-02.png'),
-    accent: '#ff3526',
-    detailMedia: Array.from({ length: 7 }, (_, index) => {
-      const number = index + 1
-      return assetUrl(`project-02/2-${number}.${number === 6 ? 'webp' : 'png'}`)
+      return assetUrl(`project-01/1-${number}.webp`)
     }),
   },
   {
     index: '03',
-    title: '广告激励平台化\n从单点活动到玩法聚合',
-    meta: '增长体验 · 2023–2024',
-    description: '围绕任务、激励与转化链路，推动单次运营活动升级为可复用的平台能力。',
-    image: assetUrl('project-03.png'),
+    title: '多维场景下的商业适配\nSoul 广告生态设计',
+    meta: 'SOUL APP · 2024–2025',
+    description: '在商业效率与社区体验之间建立平衡，搭建可持续演进的广告产品体验框架。',
+    tags: ['商业化', '广告平台', '体验设计'],
+    image: assetUrl('project-02.webp'),
     accent: '#ff3526',
-    detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.${index === 12 ? 'webp' : 'png'}`)),
+    category: '商业化与增长设计',
+    detailMedia: Array.from({ length: 7 }, (_, index) => {
+      const number = index + 1
+      return assetUrl(`project-02/2-${number}.webp`)
+    }),
   },
   {
     index: '04',
+    title: '广告激励平台化\n从单点活动到玩法聚合',
+    meta: '增长体验 · 2023–2024',
+    description: '围绕任务、激励与转化链路，推动单次运营活动升级为可复用的平台能力。',
+    tags: ['增长设计', '激励体系', '平台化'],
+    image: assetUrl('project-03.webp'),
+    accent: '#ff3526',
+    category: '商业化与增长设计',
+    detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.webp`)),
+  },
+  {
+    index: '05',
     title: '支撑 Soul 主站\n3D 资产全链路管控',
     meta: 'NAWA · EFFECTCREATOR',
     description: '打通 3D 资产生产、审核、配置与投放流程，提升跨角色协同和内容交付效率。',
-    image: assetUrl('project-04.png'),
+    tags: ['3D 资产', '复杂系统', '协同平台'],
+    image: assetUrl('project-04.webp'),
     accent: '#ff3526',
+    category: '创作者与生产力平台',
     detailMedia: [
-      '1.png',
-      '2.png',
-      '3.png',
+      '1.webp',
+      '2.webp',
+      '3.webp',
       '4.webp',
       '5.mp4',
       '6.mp4',
@@ -75,25 +117,29 @@ const projects = [
       '11.mp4',
       '12.mp4',
       '13.mp4',
-      '14.png',
+      '14.webp',
     ].map((file) => assetUrl(`project-04/${file}`)),
   },
   {
-    index: '05',
+    index: '06',
     title: '支撑用户反馈平台\n用户声音统一运营中枢',
     meta: 'SOUL APP · CONTENT CREATION',
     description: '打通工单处理、投诉收集与需求流转流程，沉淀用户一线反馈数据，支撑问题分析、功能迭代及效果验证，提升跨团队协同与产品优化效率。',
-    image: assetUrl('project-05.png'),
+    tags: ['用户反馈', '运营中枢', '数据闭环'],
+    image: assetUrl('project-05.webp'),
     accent: '#ff3526',
+    category: '创作者与生产力平台',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-05/${index + 1}.mp4`)),
   },
   {
-    index: '06',
+    index: '07',
     title: '支撑活动搭投\n0代码活动快速搭建',
     meta: 'SOUL APP · HARMONYOS',
     description: '构建 0 代码活动搭投平台，支持 H5 页面可视化搭建、组件化配置与快速发布，实现活动资产标准化管理。缩短活动上线周期，提升运营自主性与投放效率。',
-    image: assetUrl('project-06.png'),
+    tags: ['0代码', '活动搭建', '组件化'],
+    image: assetUrl('project-06.webp'),
     accent: '#ff3526',
+    category: '创作者与生产力平台',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.mp4`)),
   },
 ]
@@ -119,7 +165,7 @@ function Nav() {
     <header className={`nav shell${isScrolled ? ' nav-scrolled' : ''}`}>
       <a className="brand" href="#top">SARDINE DESIGN</a>
       <nav>
-        <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × 6</a><a href="#strength">个人优势</a>
+        <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × 7</a><a href="#strength">个人优势</a>
       </nav>
       <a className="nav-contact" href="#contact">联系我 <ArrowUpRight size={16}/></a>
     </header>
@@ -134,6 +180,18 @@ function HomePage() {
   const [toastVisible, setToastVisible] = useState(false)
   const [toastSuccess, setToastSuccess] = useState(true)
   const [toastMessage, setToastMessage] = useState('')
+  const [activeProjectCategory, setActiveProjectCategory] = useState('全部')
+  const visibleProjects = activeProjectCategory === '全部'
+    ? projects
+    : projects.filter((project) => project.category === activeProjectCategory)
+
+  const jumpToProjectCategory = (category) => {
+    setActiveProjectCategory(category)
+    window.requestAnimationFrame(() => {
+      document.getElementById('work')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
   const showCopyToast = (message, success) => {
     window.clearTimeout(toastTimerRef.current)
     setToastMessage(message)
@@ -225,12 +283,8 @@ function HomePage() {
         .fromTo('.hero-media', { scale: 1.1 }, { scale: 1, duration: 1.9 }, 1.08)
         .fromTo('.nav', { y: -24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, 1.42)
         .fromTo('.hero-eyebrow-mask .eyebrow', { yPercent: 100 }, { yPercent: 0, duration: 0.75 }, 1.55)
-        .fromTo('.hero-title-mask', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.1 }, 1.65)
-        .fromTo('.hero-main-title', { y: 72, scaleX: 0.8, transformOrigin: '50% 50%' }, { y: 0, scaleX: 1, duration: 1.2 }, 1.65)
-        .set('.hero-title-mask', { overflow: 'visible' }, 2.9)
-        .to('.hero-main-title', { y: -18, scale: 0.84, duration: 0.8, ease: 'power4.inOut' }, 3.05)
-        .fromTo('.hero-subtitle-mask', { clipPath: 'inset(0 0 100% 0)', y: 20, opacity: 0 }, { clipPath: 'inset(0 0 0% 0)', y: 0, opacity: 1, duration: 0.8 }, 3.25)
-        .fromTo('.hero-actions', { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 3.65)
+        .set('.hero-title-mask', { overflow: 'visible' }, 1.65)
+        .fromTo('.hero-actions', { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 2.1)
 
       gsap.utils.toArray('[data-motion-section]').forEach((section) => {
         const title = section.querySelector('.motion-title')
@@ -278,7 +332,7 @@ function HomePage() {
 
   return <main id="top" ref={appRef}>
     <section className="hero">
-      <video ref={heroVideoRef} className="hero-media" autoPlay muted loop playsInline preload="auto" poster={assetUrl('hero-cover.png')}>
+      <video ref={heroVideoRef} className="hero-media" autoPlay muted loop playsInline preload="auto" poster={assetUrl('hero-cover.webp')}>
         <source src={assetUrl('hero-video.mp4')} type="video/mp4" />
       </video>
       <div className="hero-shade" />
@@ -290,25 +344,19 @@ function HomePage() {
       <Nav />
       <div className="hero-content shell">
         <div className="hero-copy">
-          <div className="hero-eyebrow-mask"><div className="eyebrow">UX / PRODUCT / EXPERIENCE DESIGN</div></div>
+          <div className="hero-eyebrow-mask"><div className="eyebrow">AI PRODUCT DESIGN / UX EXPERIENCE / AGENT INTERACTION</div></div>
           <div className="hero-heading-stage">
             <div className="hero-title-mask"><h1 className="hero-main-title">Hi，我是左胤</h1></div>
             <div className="hero-subtitle-mask">
-            <TextType
-              as="p"
-              className="hero-statement"
-              text="用设计思维与AI工程协同，让创意更快成为真实可用的产品"
-              initialDelay={3500}
-              variableSpeed={{ min: 70, max: 110 }}
-              loop={false}
-              cursorCharacter="|"
-              startOnVisible={false}
-            />
+              <p className="hero-statement">9年UX设计经验，前 Soul UX 设计师。<br />聚焦 AI 产品体验与复杂系统设计，擅长将 AI 能力转化为用户可理解、可信任、可持续使用的产品体验</p>
             </div>
           </div>
           <div className="hero-actions">
-            <a href="#work" className="hero-primary">查看作品 <ArrowUpRight size={15}/></a>
-            <a href="mailto:1641043413@qq.com" className="hero-email">1641043413@qq.com</a>
+            <button type="button" className="hero-primary hero-ai-entry" onClick={() => jumpToProjectCategory('AI产品体验设计')}>
+              <span className="hero-action-badge">推荐</span>
+              查看AI作品
+            </button>
+            <button type="button" className="hero-email" onClick={() => jumpToProjectCategory('全部')}>查看全部作品</button>
           </div>
         </div>
       </div>
@@ -319,8 +367,8 @@ function HomePage() {
       <div className="motion-title" aria-hidden="true">EXPERIENCE</div>
       <div className="section-label">01 / EXPERIENCE</div>
       <div className="experience-intro">
-        <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>9 年设计实践，<br/>持续处理复杂问题。</h2></div>
-        <p>曾负责 Soul App 核心业务体验设计，覆盖内容创作、商业化、增长与 3D 资产平台。擅长将复杂业务与技术能力，转化为清晰、自然且可持续演进的用户体验。</p>
+        <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>9年设计实践，<br/>聚焦UX产品体验设计。</h2></div>
+        <p>曾负责 Soul App 核心业务体验设计，覆盖内容创作、广告商业化、增长、3D资产平台与 AI 记忆 / 用户画像探索。<br/><br/>我的优势是从复杂业务问题出发，梳理产品机制与系统链路，并将 AI 能力转化为清晰、自然、可信任的用户体验。</p>
       </div>
       <div className="stats">
           <div data-stagger-item><strong>9<sup>+</sup></strong><span>年设计经验</span></div><div data-stagger-item><strong>4<sup>+</sup></strong><span>业务领域</span></div><div data-stagger-item><strong>30<sup>+</sup></strong><span>核心项目</span></div><div data-stagger-item><strong>0→1<sup className="stat-spacer" aria-hidden="true">+</sup></strong><span>复杂产品搭建</span></div>
@@ -337,10 +385,23 @@ function HomePage() {
     <section className="work section" id="work" data-motion-section>
       <div className="shell">
         <div className="motion-title" aria-hidden="true">PROJECTS</div>
-        <div className="section-label">02 / PROJECTS · 06</div>
-        <div className="section-heading"><h2>六个项目，六种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
-        <div className="project-list">
-          {projects.map((p) => <BorderGlow className="project-glow" key={p.index} data-stagger-item>
+        <div className="section-label">02 / PROJECTS · 07</div>
+        <div className="section-heading"><h2>七个项目，七种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
+        <div className="project-tabs" role="tablist" aria-label="项目分类">
+          {projectCategories.map((category) => <button
+            className={activeProjectCategory === category ? 'is-active' : ''}
+            key={category}
+            type="button"
+            role="tab"
+            aria-selected={activeProjectCategory === category}
+            onClick={() => setActiveProjectCategory(category)}
+          >
+            {category}
+            {category === 'AI产品体验设计' && <span className="project-tab-badge">HOT</span>}
+          </button>)}
+        </div>
+        <div className="project-list" key={activeProjectCategory}>
+          {visibleProjects.map((p) => <BorderGlow className="project-glow" key={p.index} data-stagger-item>
             <a className="project-card project-link" href={`#project-${p.index}`} style={{'--accent': p.accent}} aria-label={`查看项目：${p.title.replace('\n', ' ')}`}>
               <div className="project-cover">
                 <div className="project-media">
@@ -354,7 +415,11 @@ function HomePage() {
               </div>
               <div className="project-info">
                 <div className="project-top"><span>{p.index}</span><span>{p.meta}</span></div>
-                <div className="project-content"><h3>{p.title.split('\n').map((line,i)=><React.Fragment key={line}>{line}{i===0&&<br/>}</React.Fragment>)}</h3><p>{p.description}</p></div>
+                <div className="project-content">
+                  <h3>{p.title.split('\n').map((line,i)=><React.Fragment key={line}>{line}{i===0&&<br/>}</React.Fragment>)}</h3>
+                  <p>{p.description}</p>
+                  <div className="project-tags" aria-label="项目标签">{p.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                </div>
                 <div className="project-arrow"><ArrowUpRight/></div>
               </div>
             </a>
@@ -393,28 +458,45 @@ function HomePage() {
 
 function DetailVideo({ media, label }) {
   const videoRef = useRef(null)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) video.play().catch(() => {})
+      if (entry.isIntersecting) {
+        setIsLoaded(true)
+        video.play().catch(() => {})
+      }
       else video.pause()
-    }, { threshold: 0.15, rootMargin: '120px 0px' })
+    }, { threshold: 0.15, rootMargin: '320px 0px' })
 
     observer.observe(video)
     return () => observer.disconnect()
   }, [])
 
-  return <video ref={videoRef} src={media} aria-label={label} autoPlay loop muted playsInline preload="metadata"/>
+  useEffect(() => {
+    const video = videoRef.current
+    if (isLoaded && video) video.play().catch(() => {})
+  }, [isLoaded])
+
+  return <video ref={videoRef} src={isLoaded ? media : undefined} aria-label={label} loop muted playsInline preload="none"/>
 }
 
 function ProjectDetail({ project }) {
   const detailRef = useRef(null)
+  const [isNavScrolled, setIsNavScrolled] = useState(false)
   const projectIndex = projects.findIndex((item) => item.index === project.index)
   const previousProject = projects[(projectIndex - 1 + projects.length) % projects.length]
   const nextProject = projects[(projectIndex + 1) % projects.length]
+
+  useEffect(() => {
+    const updateNav = () => setIsNavScrolled(window.scrollY > 80)
+    updateNav()
+    window.addEventListener('scroll', updateNav, { passive: true })
+    return () => window.removeEventListener('scroll', updateNav)
+  }, [])
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0)
@@ -423,10 +505,9 @@ function ProjectDetail({ project }) {
     const context = gsap.context(() => {
       const timeline = gsap.timeline({ defaults: { ease: 'power4.out' } })
       timeline
-        .fromTo('.detail-nav', { y: -28, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, 0.2)
-        .fromTo('.detail-carousel', { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 1.25 }, 0.45)
-        .fromTo('.detail-current .detail-cover-card', { clipPath: 'inset(0 100% 0 0)', scale: 1.06 }, { clipPath: 'inset(0 0% 0 0)', scale: 1, duration: 1.4 }, 0.65)
-        .fromTo('.detail-current .detail-slide-copy', { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 1.1 }, 0.95)
+        .fromTo('.detail-carousel', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 0.05)
+        .fromTo('.detail-current .detail-cover-card', { clipPath: 'inset(0 100% 0 0)', scale: 1.03 }, { clipPath: 'inset(0 0% 0 0)', scale: 1, duration: 0.9 }, 0.15)
+        .fromTo('.detail-current .detail-slide-copy', { x: 32, opacity: 0 }, { x: 0, opacity: 1, duration: 0.75 }, 0.3)
 
       gsap.utils.toArray('.detail-media-item').forEach((item) => {
         gsap.fromTo(item, { y: 52, opacity: 0, clipPath: 'inset(0 0 10% 0)' }, {
@@ -445,7 +526,7 @@ function ProjectDetail({ project }) {
 
   return <main className="project-detail" ref={detailRef}>
     <section className="detail-hero">
-      <header className="detail-nav shell">
+      <header className={`detail-nav shell${isNavScrolled ? ' nav-scrolled' : ''}`}>
         <a className="brand" href="#work">SARDINE DESIGN</a>
         <a className="detail-back" href="#work"><ArrowLeft size={16}/> 返回项目列表</a>
       </header>
@@ -457,9 +538,11 @@ function ProjectDetail({ project }) {
         <article className="detail-slide detail-current">
           <div className="detail-cover-card"><img src={project.image} alt={`${project.title.replace('\n', ' ')}封面`}/></div>
           <div className="detail-slide-copy">
-            <div className="detail-kicker">PROJECT {project.index} / {project.meta}</div>
             <h1>{(project.detailTitle || project.title.replace('\n', ' ')).split(' ').map((part) => <span className="detail-title-mask" key={part}><span className="detail-title-line">{part}</span></span>)}</h1>
             <p className="detail-subtitle">{project.detailSubtitle || project.description}</p>
+            <div className="detail-tags" aria-label="项目标签">
+              {project.tags.map((tag) => <span key={tag}>{tag}</span>)}
+            </div>
           </div>
         </article>
         <a className="detail-slide detail-side detail-next" href={`#project-${nextProject.index}`} aria-label={`下一个项目：${nextProject.title.replace('\n', ' ')}`}>
@@ -481,7 +564,7 @@ function ProjectDetail({ project }) {
         {(project.detailMedia || [project.image]).map((media, index) => <figure className="detail-media-item" key={media}>
           {media.toLowerCase().endsWith('.mp4')
             ? <DetailVideo media={media} label={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`}/>
-            : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`}/>} 
+            : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`} loading="lazy" decoding="async"/>} 
         </figure>)}
       </div>
     </section>
@@ -500,9 +583,23 @@ function ProjectDetail({ project }) {
 function App() {
   const getProjectFromHash = () => projects.find((project) => window.location.hash === `#project-${project.index}`)
   const [activeProject, setActiveProject] = useState(getProjectFromHash)
+  const activeProjectIndexRef = useRef(activeProject?.index || null)
 
   useEffect(() => {
-    const handleHashChange = () => setActiveProject(getProjectFromHash())
+    const handleHashChange = () => {
+      const nextProject = getProjectFromHash()
+      const nextProjectIndex = nextProject?.index || null
+
+      const isCrossingHomeBoundary = Boolean(activeProjectIndexRef.current) !== Boolean(nextProjectIndex)
+
+      if (isCrossingHomeBoundary) {
+        window.location.reload()
+        return
+      }
+
+      activeProjectIndexRef.current = nextProjectIndex
+      setActiveProject(nextProject)
+    }
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])

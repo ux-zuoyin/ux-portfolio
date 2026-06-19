@@ -7,6 +7,7 @@ import './styles.css'
 import BorderGlow from './components/BorderGlow'
 import TiltedCard from './components/TiltedCard'
 import TargetCursor from './components/TargetCursor'
+import AIPortfolioAgent, { AIPortfolioAssistantDrawer, PortfolioAssistantFab } from './components/AIPortfolioAgent'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -179,6 +180,8 @@ function HomePage() {
   const heroVideoRef = useRef(null)
   const appRef = useRef(null)
   const toastTimerRef = useRef(null)
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false)
+  const [hasPassedHero, setHasPassedHero] = useState(false)
   const [toastVisible, setToastVisible] = useState(false)
   const [toastSuccess, setToastSuccess] = useState(true)
   const [toastMessage, setToastMessage] = useState('')
@@ -268,6 +271,17 @@ function HomePage() {
   }, [])
 
   useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
+
+  useEffect(() => {
+    const updateAssistantFab = () => setHasPassedHero(window.scrollY > window.innerHeight * 0.9)
+    updateAssistantFab()
+    window.addEventListener('scroll', updateAssistantFab, { passive: true })
+    window.addEventListener('resize', updateAssistantFab)
+    return () => {
+      window.removeEventListener('scroll', updateAssistantFab)
+      window.removeEventListener('resize', updateAssistantFab)
+    }
+  }, [])
 
   useLayoutEffect(() => {
     const root = appRef.current
@@ -364,6 +378,8 @@ function HomePage() {
       </div>
     </section>
 
+    <AIPortfolioAgent onOpen={() => setIsAssistantOpen(true)} />
+
     <section className="experience-section section" id="experience" data-motion-section>
       <div className="shell">
       <div className="motion-title" aria-hidden="true">EXPERIENCE</div>
@@ -455,6 +471,8 @@ function HomePage() {
     <div className={`copy-toast${toastVisible ? ' is-visible' : ''}${toastSuccess ? '' : ' is-error'}`} role="status" aria-live="polite">
       {toastSuccess ? <Check size={17}/> : <AlertCircle size={17}/>}<span>{toastMessage}</span>
     </div>
+    {hasPassedHero && <PortfolioAssistantFab onOpen={() => setIsAssistantOpen(true)} />}
+    <AIPortfolioAssistantDrawer isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />
   </main>
 }
 
@@ -489,6 +507,7 @@ function DetailVideo({ media, label }) {
 function ProjectDetail({ project }) {
   const detailRef = useRef(null)
   const [isNavScrolled, setIsNavScrolled] = useState(false)
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false)
   const projectIndex = projects.findIndex((item) => item.index === project.index)
   const previousProject = projects[(projectIndex - 1 + projects.length) % projects.length]
   const nextProject = projects[(projectIndex + 1) % projects.length]
@@ -588,6 +607,8 @@ function ProjectDetail({ project }) {
     >
       <ArrowUp size={22}/>
     </button>
+    <PortfolioAssistantFab onOpen={() => setIsAssistantOpen(true)} />
+    <AIPortfolioAssistantDrawer isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />
   </main>
 }
 

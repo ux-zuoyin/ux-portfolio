@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Bot, Check, Copy, LoaderCircle, MessageCircle, Plus, Send, Sparkles, X } from 'lucide-react'
+import { Check, Copy, LoaderCircle, MessageCircle, Plus, Send, Sparkles, X } from 'lucide-react'
 import { portfolioKnowledge } from '../data/portfolioKnowledge.js'
+
+const avatarSrc = `${import.meta.env.BASE_URL}assets/sardine-avatar.svg`
 
 const openingMessage = {
   role: 'agent',
@@ -1183,7 +1185,7 @@ function AgentChatPanel({ className = '', showHeader = true }) {
           ref={index === messages.length - 1 ? latestMessageRef : null}
         >
           {message.role === 'agent' && <span className="agent-avatar" aria-hidden="true">
-            S
+            <img src={avatarSrc} alt="" />
           </span>}
           {message.role === 'agent'
             ? <div className="agent-response-stack">
@@ -1217,7 +1219,7 @@ function AgentChatPanel({ className = '', showHeader = true }) {
         </div>}
       </React.Fragment>)}
       {isLoading && <div className="agent-message assistant-message is-agent is-loading">
-        <span className="agent-avatar" aria-hidden="true">S</span>
+        <span className="agent-avatar" aria-hidden="true"><img src={avatarSrc} alt="" /></span>
         <p><LoaderCircle size={16} /> 正在从本地知识库整理回答</p>
       </div>}
     </div>

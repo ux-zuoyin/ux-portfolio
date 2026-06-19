@@ -569,11 +569,14 @@ function ProjectDetail({ project }) {
         </div>
       </div>
       <div className="shell detail-media-stack">
-        {(project.detailMedia || [project.image]).map((media, index) => <figure className="detail-media-item" key={media}>
-          {media.toLowerCase().endsWith('.mp4')
-            ? <DetailVideo media={media} label={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`}/>
-            : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`} loading="lazy" decoding="async"/>} 
-        </figure>)}
+        {(project.detailMedia || [project.image]).map((media, index) => {
+          const isVideo = media.toLowerCase().endsWith('.mp4')
+          return <figure className={`detail-media-item${isVideo ? ' detail-media-video' : ''}`} key={media}>
+            {isVideo
+              ? <DetailVideo media={media} label={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`}/>
+              : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`} loading="lazy" decoding="async"/>}
+          </figure>
+        })}
       </div>
     </section>
     <button

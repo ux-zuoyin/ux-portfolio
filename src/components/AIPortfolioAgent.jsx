@@ -1183,7 +1183,7 @@ function AgentChatPanel({ className = '', showHeader = true }) {
           ref={index === messages.length - 1 ? latestMessageRef : null}
         >
           {message.role === 'agent' && <span className="agent-avatar" aria-hidden="true">
-            <Bot size={17} />
+            S
           </span>}
           {message.role === 'agent'
             ? <div className="agent-response-stack">
@@ -1217,7 +1217,7 @@ function AgentChatPanel({ className = '', showHeader = true }) {
         </div>}
       </React.Fragment>)}
       {isLoading && <div className="agent-message assistant-message is-agent is-loading">
-        <span className="agent-avatar" aria-hidden="true"><Bot size={17} /></span>
+        <span className="agent-avatar" aria-hidden="true">S</span>
         <p><LoaderCircle size={16} /> 正在从本地知识库整理回答</p>
       </div>}
     </div>

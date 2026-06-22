@@ -145,6 +145,17 @@ const projects = [
     category: '创作者与生产力平台',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.mp4`)),
   },
+  createProjectTemplate('08', {
+    title: 'Portfolio AI Agent\n作品集智能导览助手',
+    meta: 'PERSONAL PROJECT · 2026',
+    description: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
+    tags: ['AI Agent', '作品集导览', '知识库设计', '对话体验', 'AI Coding'],
+    image: assetUrl('project-08/cover.webp'),
+    detailTitle: 'Portfolio AI Agent\n作品集智能导览助手',
+    detailSubtitle: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
+    category: 'AI产品体验设计',
+    detailMedia: Array.from({ length: 14 }, (_, index) => assetUrl(`project-08/${String(index + 1).padStart(2, '0')}.webp`)),
+  }),
 ]
 
 const capabilities = [
@@ -168,7 +179,7 @@ function Nav() {
     <header className={`nav shell${isScrolled ? ' nav-scrolled' : ''}`}>
       <a className="brand" href="#top">SARDINE DESIGN</a>
       <nav>
-        <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × 7</a><a href="#strength">个人优势</a>
+        <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × 8</a><a href="#strength">个人优势</a>
       </nav>
       <a className="nav-contact" href="#contact">联系我 <ArrowUpRight size={16}/></a>
     </header>
@@ -403,8 +414,8 @@ function HomePage() {
     <section className="work section" id="work" data-motion-section>
       <div className="shell">
         <div className="motion-title" aria-hidden="true">PROJECTS</div>
-        <div className="section-label">02 / PROJECTS · 07</div>
-        <div className="section-heading"><h2>七个项目，七种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
+        <div className="section-label">02 / PROJECTS · 08</div>
+        <div className="section-heading"><h2>八个项目，八种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
         <div className="project-tabs" role="tablist" aria-label="项目分类">
           {projectCategories.map((category) => <button
             className={activeProjectCategory === category ? 'is-active' : ''}
@@ -504,6 +515,18 @@ function DetailVideo({ media, label }) {
   return <video ref={videoRef} src={isLoaded ? media : undefined} aria-label={label} loop muted playsInline preload="none"/>
 }
 
+function DetailMediaItem({ media, label, isVideo }) {
+  const [hasError, setHasError] = useState(false)
+
+  if (hasError) return null
+
+  return <figure className={`detail-media-item${isVideo ? ' detail-media-video' : ''}`}>
+    {isVideo
+      ? <DetailVideo media={media} label={label}/>
+      : <img src={media} alt={label} loading="lazy" decoding="async" onError={() => setHasError(true)}/>}
+  </figure>
+}
+
 function ProjectDetail({ project }) {
   const detailRef = useRef(null)
   const [isNavScrolled, setIsNavScrolled] = useState(false)
@@ -590,11 +613,12 @@ function ProjectDetail({ project }) {
       <div className="shell detail-media-stack">
         {(project.detailMedia || [project.image]).map((media, index) => {
           const isVideo = media.toLowerCase().endsWith('.mp4')
-          return <figure className={`detail-media-item${isVideo ? ' detail-media-video' : ''}`} key={media}>
-            {isVideo
-              ? <DetailVideo media={media} label={`${project.detailTitle || project.title.replace('\n', ' ')} 动效 ${index + 1}`}/>
-              : <img src={media} alt={`${project.detailTitle || project.title.replace('\n', ' ')} 展示图 ${index + 1}`} loading="lazy" decoding="async"/>}
-          </figure>
+          return <DetailMediaItem
+            key={media}
+            media={media}
+            isVideo={isVideo}
+            label={`${project.detailTitle || project.title.replace('\n', ' ')} ${isVideo ? '动效' : '展示图'} ${index + 1}`}
+          />
         })}
       </div>
     </section>

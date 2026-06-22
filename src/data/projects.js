@@ -130,4 +130,15 @@ export const projects = [
     category: '创作者与生产力平台',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.mp4`)),
   },
+  createProjectTemplate('08', {
+    title: 'Portfolio AI Agent\n作品集智能导览助手',
+    meta: 'PERSONAL PROJECT · 2026',
+    description: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
+    tags: ['AI Agent', '作品集导览', '知识库设计', '对话体验', 'AI Coding'],
+    image: assetUrl('project-08/cover.webp'),
+    detailTitle: 'Portfolio AI Agent\n作品集智能导览助手',
+    detailSubtitle: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
+    category: 'AI产品体验设计',
+    detailMedia: Array.from({ length: 14 }, (_, index) => assetUrl(`project-08/${String(index + 1).padStart(2, '0')}.webp`)),
+  }),
 ]

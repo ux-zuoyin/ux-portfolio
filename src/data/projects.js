@@ -138,6 +138,7 @@ export const projects = [
     image: assetUrl('project-08/cover.webp'),
     detailTitle: 'Portfolio AI Agent\n作品集智能导览助手',
     detailSubtitle: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
+    assistantBrief: 'AI Portfolio Agent 是一个基于本地项目知识库构建的作品集智能讲解助手，用来帮助面试官快速理解左胤的项目经历、设计判断、AI 产品思考和岗位匹配度。项目通过 Codex 辅助完成，包含助手入口设计、推荐问题、继续追问、相关项目证据、结构化回答、底部快捷入口和本地知识库 mock 逻辑，体现了 AI Agent 产品体验设计、AI UX 和 AI Coding 原型搭建能力。',
     category: 'AI产品体验设计',
     detailMedia: Array.from({ length: 14 }, (_, index) => assetUrl(`project-08/${String(index + 1).padStart(2, '0')}.webp`)),
   }),

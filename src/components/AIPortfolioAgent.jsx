@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Copy, LoaderCircle, MessageCircle, Plus, Send, Sparkles, X } from 'lucide-react'
 import { portfolioKnowledge } from '../data/portfolioKnowledge.js'
+import { projects as portfolioProjects } from '../data/projects.js'
 
 const avatarSrc = `${import.meta.env.BASE_URL}assets/sardine-avatar.svg`
 
@@ -31,9 +32,54 @@ function includesAny(text, keywords) {
   return keywords.some((keyword) => text.includes(normalizeText(keyword)))
 }
 
+function splitKeywordText(value) {
+  return String(value || '')
+    .split(/[\s\n/｜|·,，。:：]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function convertProjectToAssistantKnowledge(project) {
+  const subtitle = project.subtitle || project.detailSubtitle || project.description || ''
+  const title = project.detailTitle || project.title
+  const keywords = [
+    project.index,
+    `项目${project.index}`,
+    `project-${project.index}`,
+    project.category,
+    title,
+    subtitle,
+    ...(project.tags || []),
+  ].flatMap(splitKeywordText)
+
+  return {
+    title: String(title || '').replace(/\n/g, ' '),
+    category: project.category,
+    keywords: [...new Set(keywords)],
+    summary: project.assistantBrief,
+    value: project.assistantBrief,
+  }
+}
+
+const projectKnowledgeFromData = portfolioProjects
+  .filter((project) => project.assistantBrief)
+  .map(convertProjectToAssistantKnowledge)
+
+const assistantProjectKnowledge = [
+  ...portfolioKnowledge.projects,
+  ...projectKnowledgeFromData,
+].reduce((result, project) => {
+  const titleKey = normalizeText(project.title)
+  if (!result.some((item) => normalizeText(item.title) === titleKey)) {
+    result.push(project)
+  }
+  return result
+}, [])
+
 function findRelevantProjects(question) {
   const normalizedQuestion = normalizeText(question)
-  return portfolioKnowledge.projects.filter((project) => {
+  return assistantProjectKnowledge.filter((project) => {
+    const keywords = project.keywords || []
     const corpus = normalizeText([
       project.title,
       project.category,
@@ -43,9 +89,9 @@ function findRelevantProjects(question) {
       project.designJudgment,
       project.solution,
       project.value,
-      ...project.keywords,
+      ...keywords,
     ].join(' '))
-    return project.keywords.some((keyword) => normalizedQuestion.includes(normalizeText(keyword)))
+    return keywords.some((keyword) => normalizedQuestion.includes(normalizeText(keyword)))
       || normalizedQuestion.includes(normalizeText(project.category))
       || corpus.includes(normalizedQuestion)
   })
@@ -617,8 +663,8 @@ function formatAIEngineeringBoundaryAnswer() {
 }
 
 function findProjectByKeyword(keywords) {
-  return portfolioKnowledge.projects.find((project) => {
-    const corpus = normalizeText([project.title, project.summary, ...project.keywords].join(' '))
+  return assistantProjectKnowledge.find((project) => {
+    const corpus = normalizeText([project.title, project.summary, ...(project.keywords || [])].join(' '))
     return keywords.some((keyword) => corpus.includes(normalizeText(keyword)))
   })
 }

@@ -28,6 +28,24 @@ function normalizeText(value) {
   return value.toLowerCase().replace(/\s+/g, '')
 }
 
+function normalizeQuestion(value) {
+  const chineseNumberMap = {
+    一: '1',
+    二: '2',
+    三: '3',
+    四: '4',
+    五: '5',
+    六: '6',
+    七: '7',
+    八: '8',
+  }
+
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[一二三四五六七八]/g, (match) => chineseNumberMap[match])
+    .replace(/\s+/g, '')
+}
+
 function includesAny(text, keywords) {
   return keywords.some((keyword) => text.includes(normalizeText(keyword)))
 }
@@ -37,6 +55,11 @@ function splitKeywordText(value) {
     .split(/[\s\n/｜|·,，。:：]+/)
     .map((item) => item.trim())
     .filter(Boolean)
+}
+
+function isUsefulProjectKeyword(value) {
+  const keyword = normalizeQuestion(value)
+  return keyword.length > 2 && !['ai', 'ux', '3d', 'b端'].includes(keyword)
 }
 
 function convertProjectToAssistantKnowledge(project) {
@@ -95,6 +118,147 @@ function findRelevantProjects(question) {
       || normalizedQuestion.includes(normalizeText(project.category))
       || corpus.includes(normalizedQuestion)
   })
+}
+
+function stripProjectIntentWords(value) {
+  return normalizeQuestion(value)
+    .replace(/介绍一下|介绍下|介绍|是什么|项目|第|个/g, '')
+}
+
+function getProjectSearchCorpus(project) {
+  const corpus = [
+    project.index,
+    project.title,
+    project.detailTitle,
+    project.subtitle,
+    project.detailSubtitle,
+    project.description,
+    project.category,
+    project.assistantBrief,
+    ...(project.tags || []),
+  ].filter(Boolean)
+
+  if (corpus.some((item) => normalizeQuestion(item).includes('作品集') && normalizeQuestion(item).includes('助手'))) {
+    corpus.push('作品集助手')
+  }
+
+  return corpus
+}
+
+function getProjectByQuestion(question) {
+  const normalizedQuestion = normalizeQuestion(question)
+  const searchableQuestion = stripProjectIntentWords(question)
+
+  for (const project of portfolioProjects) {
+    const paddedIndex = project.index
+    const numericIndex = String(Number(project.index))
+    const indexPatterns = [
+      `项目${numericIndex}`,
+      `项目${paddedIndex}`,
+      `project${numericIndex}`,
+      `project${paddedIndex}`,
+      `project-${numericIndex}`,
+      `project-${paddedIndex}`,
+      `第${numericIndex}个项目`,
+      `第${paddedIndex}个项目`,
+    ]
+
+    if (
+      normalizedQuestion === numericIndex
+      || normalizedQuestion === paddedIndex
+      || indexPatterns.some((pattern) => normalizedQuestion.includes(pattern))
+    ) {
+      return project
+    }
+  }
+
+  for (const project of portfolioProjects) {
+    const titleFields = [project.title, project.detailTitle].filter(Boolean)
+    const titleCorpus = titleFields
+      .flatMap(splitKeywordText)
+      .filter(isUsefulProjectKeyword)
+
+    if (
+      (searchableQuestion.length > 1 && titleFields.some((field) => normalizeQuestion(field).includes(searchableQuestion)))
+      || titleCorpus.some((keyword) => normalizedQuestion.includes(normalizeQuestion(keyword)))
+    ) {
+      return project
+    }
+  }
+
+  for (const project of portfolioProjects) {
+    const tagCorpus = project.tags || []
+
+    if (tagCorpus.some((tag) => normalizedQuestion.includes(normalizeQuestion(tag)))) {
+      return project
+    }
+  }
+
+  for (const project of portfolioProjects) {
+    const projectCorpus = getProjectSearchCorpus(project)
+    const briefCorpus = projectCorpus
+      .flatMap(splitKeywordText)
+      .filter(isUsefulProjectKeyword)
+
+    if (
+      projectCorpus.some((field) => {
+        const normalizedField = normalizeQuestion(field)
+        return searchableQuestion.length > 1 && normalizedField.includes(searchableQuestion)
+      })
+      || briefCorpus.some((keyword) => {
+        const normalizedKeyword = normalizeQuestion(keyword)
+        return normalizedQuestion.includes(normalizedKeyword)
+          || (searchableQuestion.length > 1 && normalizedKeyword.includes(searchableQuestion))
+      })
+    ) {
+      return project
+    }
+  }
+
+  return null
+}
+
+function getProjectSubtitle(project) {
+  return project.subtitle || project.detailSubtitle || project.description || ''
+}
+
+function generateSingleProjectAnswer(project) {
+  const subtitle = getProjectSubtitle(project)
+  const tags = project.tags || []
+  const brief = project.assistantBrief || [
+    project.detailTitle || project.title,
+    subtitle,
+    tags.length > 0 ? `关键词包括：${tags.join('、')}。` : '',
+  ].filter(Boolean).join(' ')
+
+  return [
+    '## 项目总结',
+    '',
+    brief,
+    '',
+    '---',
+    '',
+    '## 这个项目解决的问题',
+    '',
+    `${project.detailTitle || project.title} 主要围绕「${subtitle || '当前项目场景'}」展开，结合 ${tags.length > 0 ? tags.join('、') : '项目目标和用户体验'}，重点解决相关场景中的理解成本、操作成本或协作效率问题。`,
+    '',
+    '---',
+    '',
+    '## 左胤负责的内容',
+    '',
+    project.assistantBrief
+      ? `从项目资料看，左胤主要负责其中的体验设计、交互链路、信息组织和方案表达工作。${project.assistantBrief}`
+      : '从现有项目资料看，左胤主要负责项目体验设计、信息结构梳理、关键流程设计和方案表达。',
+    '',
+    '---',
+    '',
+    '## 能力体现',
+    '',
+    [
+      ...tags.slice(0, 4),
+      project.category,
+    ].filter(Boolean).slice(0, 5).map((item) => `- ${item}`).join('\n'),
+  ].join('\n')
 }
 
 function formatProjectAnswer(project) {
@@ -731,6 +895,11 @@ function formatAIKnowledgeAnswer(item) {
 
 function buildAgentReply(question) {
   void agentResponseGuidelines
+  const specificProject = getProjectByQuestion(question)
+  if (specificProject) {
+    return generateSingleProjectAnswer(specificProject)
+  }
+
   const normalizedQuestion = normalizeText(question)
   const relevantProjects = findRelevantProjects(question)
   const isBEndTopic = includesAny(normalizedQuestion, ['B 端', 'B端', '后台', '平台型', '平台产品', '复杂后台', '复杂系统', '用户反馈', '运营中枢', '活动搭建', '活动搭投'])

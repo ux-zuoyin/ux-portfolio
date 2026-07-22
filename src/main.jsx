@@ -43,13 +43,13 @@ const createProjectTemplate = (index, overrides = {}) => {
 const projects = [
   // 新增项目时复制此调用，并通过第二个参数覆盖标题、封面、标签及详情内容。
   createProjectTemplate('01', {
-    title: '灵魂记忆空间\n基于 AI 记忆构建用户画像体系',
-    description: '从用户行为到社交连接，探索兴趣社交场景下的新一代 Persona System',
-    tags: ['AI记忆', '用户画像', '兴趣匹配'],
+    title: '灵魂记忆\nAI动态画像的可信与可控体验设计',
+    description: '围绕信息分级、用户确认、画像生成与展示控制，建立一套用户可理解、可纠错、可管理的动态画像体验',
+    tags: ['UX体验设计', 'UI设计', 'AIUX工作流'],
     image: assetUrl('project-memory.webp'),
-    detailTitle: '灵魂记忆空间\n基于 AI 记忆构建用户画像体系',
-    detailSubtitle: '从用户行为到社交连接，探索兴趣社交场景下的新一代 Persona System',
-    detailMedia: Array.from({ length: 14 }, (_, index) => assetUrl(`project-memory/${index + 1}.webp`)),
+    detailTitle: '灵魂记忆\nAI动态画像的可信与可控体验设计',
+    detailSubtitle: '围绕信息分级、用户确认、画像生成与展示控制，建立一套用户可理解、可纠错、可管理的动态画像体验',
+    detailMedia: Array.from({ length: 9 }, (_, index) => assetUrl(`project-memory/${index + 1}.webp`)),
   }),
   {
     index: '02',

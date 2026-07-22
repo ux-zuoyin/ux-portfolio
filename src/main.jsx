@@ -152,7 +152,15 @@ function HomePage() {
 
   useLayoutEffect(() => {
     const root = appRef.current
-    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!root) return
+
+    const shouldSkipHomeMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 800px)').matches
+    if (shouldSkipHomeMotion) {
+      gsap.set(root.querySelectorAll('.nav, .hero-eyebrow-mask, .hero-title-mask, .hero-subtitle-mask, .hero-actions'), { visibility: 'visible' })
+      gsap.set(root.querySelectorAll('.opening-curtain'), { display: 'none' })
+      gsap.set(root.querySelectorAll('.hero-media, .motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
+      return
+    }
 
     const context = gsap.context(() => {
       const opening = gsap.timeline({ defaults: { ease: 'power4.out' } })

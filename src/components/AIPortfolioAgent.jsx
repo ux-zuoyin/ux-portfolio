@@ -1491,30 +1491,26 @@ export function AIPortfolioAssistantDrawer({ isOpen, onClose }) {
     if (!isOpen) return undefined
 
     const scrollY = window.scrollY
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    const previousDocumentOverflow = document.documentElement.style.overflow
     const previousBodyStyle = {
-      position: document.body.style.position,
-      top: document.body.style.top,
-      left: document.body.style.left,
-      right: document.body.style.right,
-      width: document.body.style.width,
       overflow: document.body.style.overflow,
+      paddingRight: document.body.style.paddingRight,
     }
 
-    document.body.style.position = 'fixed'
-    document.body.style.top = `-${scrollY}px`
-    document.body.style.left = '0'
-    document.body.style.right = '0'
-    document.body.style.width = '100%'
+    document.documentElement.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+    }
 
     return () => {
-      document.body.style.position = previousBodyStyle.position
-      document.body.style.top = previousBodyStyle.top
-      document.body.style.left = previousBodyStyle.left
-      document.body.style.right = previousBodyStyle.right
-      document.body.style.width = previousBodyStyle.width
+      document.documentElement.style.overflow = previousDocumentOverflow
       document.body.style.overflow = previousBodyStyle.overflow
-      window.scrollTo(0, scrollY)
+      document.body.style.paddingRight = previousBodyStyle.paddingRight
+      if (window.scrollY !== scrollY) {
+        window.scrollTo({ top: scrollY, left: 0, behavior: 'auto' })
+      }
     }
   }, [isOpen])
 

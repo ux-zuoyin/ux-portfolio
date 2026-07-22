@@ -2,9 +2,9 @@ const assetUrl = (file) => `${import.meta.env.BASE_URL}assets/${file}`
 
 export const projectCategories = [
   '全部',
-  'AI产品体验设计',
-  '商业化与增长设计',
+  'UX体验设计',
   '创作者与生产力平台',
+  '项目自驱',
 ]
 
 export const createProjectTemplate = (index, overrides = {}) => {
@@ -20,7 +20,7 @@ export const createProjectTemplate = (index, overrides = {}) => {
     detailTitle: '新项目内容准备中',
     detailSubtitle: '项目详情将在内容整理完成后补充',
     detailMedia: [placeholderImage],
-    category: 'AI产品体验设计',
+    category: 'UX体验设计',
     ...overrides,
   }
 }
@@ -38,48 +38,60 @@ export const projects = [
     detailMedia: Array.from({ length: 9 }, (_, index) => assetUrl(`project-memory/${index + 1}.webp`)),
   }),
   {
+    index: '04',
+    title: '让用户在多任务场景中\n找到始终最值得参与的下一步',
+    meta: '增长体验 · 2023–2024',
+    description: '围绕用户「价值-主推-长尾」判断路径，优化落地页体验',
+    tags: ['UX体验设计', '多任务场景', '活动视觉&交互'],
+    image: assetUrl('project-03.webp'),
+    accent: '#ff3526',
+    category: 'UX体验设计',
+    assistantBrief: '广告激励平台化是围绕任务、激励和转化链路的增长设计项目，解决单点活动复用度低、运营配置成本高的问题。左胤参与激励机制、平台化流程和活动玩法聚合设计，体现增长体验、平台化抽象和业务转化设计能力。',
+    detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.webp`)),
+  },
+  {
     index: '02',
-    title: '构建全链路发布器\nAIGC 辅助体系',
+    title: '让 AI适时介入创作\n而不打断用户原有的发布路径',
     meta: 'SOUL APP · 2025–2026',
-    description: '从“不敢发”到“发得好”，以心智破冰、联想写作与确定性反馈重构内容发布体验。',
-    tags: ['AIGC', '内容创作', '体验策略'],
+    description: '降低创作门槛的同时保留用户对内容的最终控制',
+    tags: ['UX体验设计', '体验策略'],
     image: assetUrl('project-01.webp'),
     accent: '#ff3526',
     detailTitle: '发布器 AI 辅助发帖',
     detailSubtitle: '实现从「不敢发」到「发得好」的体验跃迁',
     assistantBrief: 'AIGC 发布器是面向社区内容创作的 AI 辅助发布项目，解决用户不知道发什么、担心表达不好和缺少反馈的问题。左胤负责发布链路、AI 辅助节点和确定性反馈体验设计，体现 AIGC 工具、内容生产流程和 AI UX 设计能力。',
-    category: 'AI产品体验设计',
+    category: 'UX体验设计',
     detailMedia: Array.from({ length: 8 }, (_, index) => {
       const number = index + 1
       return assetUrl(`project-01/1-${number}.webp`)
     }),
   },
+  createProjectTemplate('08', {
+    title: 'Portfolio AI Agent\n作品集智能导览助手',
+    meta: 'PERSONAL PROJECT · 2026',
+    description: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
+    tags: ['AI Agent', '作品集导览', '知识库设计', '对话体验', 'AI Coding'],
+    image: assetUrl('project-08/cover.webp'),
+    detailTitle: 'Portfolio AI Agent\n作品集智能导览助手',
+    detailSubtitle: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
+    assistantBrief: 'AI Portfolio Agent 是一个基于本地项目知识库构建的作品集智能讲解助手，用来帮助面试官快速理解左胤的项目经历、设计判断、AI 产品思考和岗位匹配度。项目通过 Codex 辅助完成，包含助手入口设计、推荐问题、继续追问、相关项目证据、结构化回答、底部快捷入口和本地知识库 mock 逻辑，体现了 AI Agent 产品体验设计、AI UX 和 AI Coding 原型搭建能力。',
+    category: '项目自驱',
+    detailMedia: Array.from({ length: 14 }, (_, index) => assetUrl(`project-08/${String(index + 1).padStart(2, '0')}.webp`)),
+  }),
   {
     index: '03',
     title: '多维场景下的商业适配\nSoul 广告生态设计',
     meta: 'SOUL APP · 2024–2025',
     description: '在商业效率与社区体验之间建立平衡，搭建可持续演进的广告产品体验框架。',
-    tags: ['商业化', '广告平台', '体验设计'],
+    tags: ['平台基建', '商业化', '体验设计'],
     image: assetUrl('project-02.webp'),
     accent: '#ff3526',
-    category: '商业化与增长设计',
+    category: 'UX体验设计',
     assistantBrief: 'Soul 广告生态设计是商业化与社区体验平衡项目，解决广告转化目标和用户低打扰体验之间的冲突。左胤负责多场景广告适配、信息层级和转化路径设计，体现商业化产品、场景化体验和复杂规则梳理能力。',
     detailMedia: Array.from({ length: 7 }, (_, index) => {
       const number = index + 1
       return assetUrl(`project-02/2-${number}.webp`)
     }),
-  },
-  {
-    index: '04',
-    title: '广告激励平台化\n从单点活动到玩法聚合',
-    meta: '增长体验 · 2023–2024',
-    description: '围绕任务、激励与转化链路，推动单次运营活动升级为可复用的平台能力。',
-    tags: ['增长设计', '激励体系', '平台化'],
-    image: assetUrl('project-03.webp'),
-    accent: '#ff3526',
-    category: '商业化与增长设计',
-    assistantBrief: '广告激励平台化是围绕任务、激励和转化链路的增长设计项目，解决单点活动复用度低、运营配置成本高的问题。左胤参与激励机制、平台化流程和活动玩法聚合设计，体现增长体验、平台化抽象和业务转化设计能力。',
-    detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.webp`)),
   },
   {
     index: '05',
@@ -137,16 +149,4 @@ export const projects = [
     assistantBrief: '0 代码活动快速搭建是面向运营活动配置的低代码平台项目，解决活动上线依赖研发、配置效率低和资产难复用的问题。左胤负责可视化搭建流程、组件化配置和发布链路设计，体现 B 端工具、平台化能力和运营效率设计能力。',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.mp4`)),
   },
-  createProjectTemplate('08', {
-    title: 'Portfolio AI Agent\n作品集智能导览助手',
-    meta: 'PERSONAL PROJECT · 2026',
-    description: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
-    tags: ['AI Agent', '作品集导览', '知识库设计', '对话体验', 'AI Coding'],
-    image: assetUrl('project-08/cover.webp'),
-    detailTitle: 'Portfolio AI Agent\n作品集智能导览助手',
-    detailSubtitle: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
-    assistantBrief: 'AI Portfolio Agent 是一个基于本地项目知识库构建的作品集智能讲解助手，用来帮助面试官快速理解左胤的项目经历、设计判断、AI 产品思考和岗位匹配度。项目通过 Codex 辅助完成，包含助手入口设计、推荐问题、继续追问、相关项目证据、结构化回答、底部快捷入口和本地知识库 mock 逻辑，体现了 AI Agent 产品体验设计、AI UX 和 AI Coding 原型搭建能力。',
-    category: 'AI产品体验设计',
-    detailMedia: Array.from({ length: 14 }, (_, index) => assetUrl(`project-08/${String(index + 1).padStart(2, '0')}.webp`)),
-  }),
 ]

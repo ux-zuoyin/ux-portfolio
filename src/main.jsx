@@ -235,11 +235,7 @@ function HomePage() {
             </div>
           </div>
           <div className="hero-actions">
-            <button type="button" className="hero-primary hero-ai-entry" onClick={() => jumpToProjectCategory('AI产品体验设计')}>
-              <span className="hero-action-badge">推荐</span>
-              查看AI作品
-            </button>
-            <button type="button" className="hero-email" onClick={() => jumpToProjectCategory('全部')}>查看全部作品</button>
+            <button type="button" className="hero-primary" onClick={() => jumpToProjectCategory('全部')}>查看全部作品</button>
           </div>
         </div>
       </div>
@@ -282,7 +278,7 @@ function HomePage() {
             onClick={() => setActiveProjectCategory(category)}
           >
             {category}
-            {category === 'AI产品体验设计' && <span className="project-tab-badge">HOT</span>}
+            {category === 'UX体验设计' && <span className="project-tab-badge">HOT</span>}
           </button>)}
         </div>
         <div className="project-list" key={activeProjectCategory}>

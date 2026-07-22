@@ -134,6 +134,7 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 @media(max-width:620px){.project-detail .detail-hero{height:76px;min-height:76px}.project-detail .detail-body{padding-top:36px}}
 @media(max-width:800px){.project-detail .detail-intro>.section-label{display:none}.project-detail .detail-intro-grid{margin-top:0}}
 @media(max-width:800px){.project-detail .detail-body .section-label{display:none!important}.project-detail .detail-intro-grid{margin-top:0!important}}
+@media(max-width:800px){.project-detail .portfolio-assistant-fab,.project-detail .assistant-drawer{display:none!important}}
 
 /* AI Portfolio Assistant */
 .agent-entry-section{position:relative;z-index:4;padding:0 0 112px;background:linear-gradient(180deg,rgba(8,7,7,0),rgba(8,7,7,.94) 48%,#080707)}

@@ -397,7 +397,8 @@ function ProjectDetail({ project }) {
   useLayoutEffect(() => {
     scrollToPageTop()
     const scrollResetFrame = window.requestAnimationFrame(scrollToPageTop)
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const shouldSkipDetailMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 800px)').matches
+    if (shouldSkipDetailMotion) {
       return () => window.cancelAnimationFrame(scrollResetFrame)
     }
 

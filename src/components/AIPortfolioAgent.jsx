@@ -323,9 +323,9 @@ function getFollowUpSuggestions(question) {
 
   if (isAITopic) {
     return [
-      { label: '看 AI 标签项目', question: 'AI 标签管理与灵魂记忆空间这个项目具体解决了什么问题？' },
+      { label: '看灵魂记忆', question: '灵魂记忆如何避免 AI 过度定义用户？' },
       { label: '看 AIGC 发布器', question: 'AIGC 发布器的设计判断是什么？' },
-      { label: '看 AI Agent Demo', question: '这个 AI 作品集助手 Demo 能证明什么能力？' },
+      { label: '看 AI Agent', question: '这个作品集智能导览助手能证明什么能力？' },
     ]
   }
 
@@ -339,7 +339,7 @@ function getFollowUpSuggestions(question) {
 
   if (isCommercialTopic) {
     return [
-      { label: '看商业化项目', question: '广告商业化项目如何平衡体验和转化？' },
+      { label: '看福利积分项目', question: '福利积分项目如何平衡体验、参与效率和商业目标？' },
       { label: '看设计取舍', question: '左胤在商业化项目中有哪些关键设计判断和方案取舍？' },
       { label: '看岗位匹配', question: '商业化设计经验能支撑他匹配什么类型岗位？' },
     ]
@@ -384,7 +384,7 @@ function formatAgentCapabilityAnswer() {
     '## 能力边界',
     '',
     capability.boundary,
-    ...formatRelatedEvidenceSection(['AI 作品集助手 Demo', 'AI 标签管理与灵魂记忆空间', 'AIGC 发布器']),
+    ...formatRelatedEvidenceSection(['Portfolio AI Agent 作品集智能导览助手', '灵魂记忆', 'AIGC 发布器']),
   ].join('\n')
 }
 
@@ -409,29 +409,30 @@ function formatAssistantIntroAnswer() {
 }
 
 function formatBEndCapabilityAnswer() {
+  const capability = portfolioKnowledge.bEndCapability
   return [
     '## 结论',
     '',
-    '左胤具备较完整的 B 端 / 后台产品设计经验，不只是做页面 UI，而是参与过多角色流程、状态流转、配置效率、数据闭环和运营协作类问题的设计。',
+    capability.summary,
     '',
     '---',
     '',
     '## 经验覆盖面',
     '',
-    '他的 B 端经验主要集中在运营后台、内容生产工具、活动配置平台和用户反馈处理系统等方向。代表项目包括用户反馈运营中枢、0 代码活动搭建平台、AIGC 发布器和广告商业化相关后台。',
+    `他的 B 端经验主要覆盖 ${capability.scope.join('、')}。`,
     '',
     '---',
     '',
     '## 项目深度',
     '',
-    '这些项目的深度不在于页面数量，而在于是否处理过复杂业务规则。比如多角色协作、工单状态流转、配置发布链路、异常处理、数据回流和运营效率提升，这些都是 B 端设计里比较关键的问题。',
+    capability.depthJudgment,
     '',
     '---',
     '',
     '## 能力判断',
     '',
-    '如果从岗位匹配角度看，他比较适合 AI 产品后台、运营平台、内容生产工具、配置型系统、CMS / 工单类系统等方向。优势是能把复杂流程拆成清晰的信息架构和可执行任务链路。',
-    ...formatRelatedEvidenceSection(['用户反馈运营中枢', '0 代码活动搭建平台', 'AIGC 发布器', '广告商业化相关后台']),
+    `关键能力包括 ${capability.capabilities.join('、')}。${capability.boundary}`,
+    ...formatRelatedEvidenceSection(capability.representativeProjects),
   ].join('\n')
 }
 
@@ -441,10 +442,10 @@ function formatRoleFitAnswer(question) {
   const isAIRole = includesAny(normalizedQuestion, ['AI', 'AIGC', 'Agent', '智能'])
   const roleLabel = isBEndRole ? 'B 端 / 复杂系统设计岗位' : isAIRole ? 'AI 产品体验设计岗位' : '偏 AI 产品体验、复杂 B 端和平台型工具的岗位'
   const evidenceProjects = isBEndRole
-    ? ['B 端后台项目', '用户反馈运营中枢', '0 代码活动搭建', 'NAWA 编辑器']
+    ? ['NAWA 编辑器', '新活动搭投平台', '用户声音统一运营中枢']
     : isAIRole
-      ? ['AI 标签管理与灵魂记忆空间', 'AIGC 发布器', 'AI 作品集助手 Demo']
-      : ['AI 标签管理与灵魂记忆空间', 'B 端后台项目', 'AIGC 发布器', '广告商业化项目']
+      ? ['灵魂记忆', 'AIGC 发布器', 'Portfolio AI Agent']
+      : ['灵魂记忆', 'NAWA 编辑器', '多任务福利积分页', 'AIGC 发布器']
 
   return [
     '## 岗位匹配判断',
@@ -464,8 +465,8 @@ function formatRoleFitAnswer(question) {
     '## 项目证据',
     '',
     isBEndRole
-      ? '对应证据包括 B 端后台项目、用户反馈运营中枢、0 代码活动搭建和 NAWA 编辑器。这些项目能体现他对后台流程、平台化能力和复杂协作链路的设计经验。'
-      : '对应证据包括 AI 标签管理与灵魂记忆空间、AIGC 发布器，以及这个用 Codex 辅助搭建的 AI 作品集助手 Demo。这些项目分别覆盖用户理解、AI 创作辅助和 Agent 原型验证。',
+      ? '对应证据包括 NAWA 编辑器、新活动搭投平台和用户声音统一运营中枢。这些项目能体现他对后台流程、平台化能力和复杂协作链路的设计经验。'
+      : '对应证据包括灵魂记忆、AIGC 发布器，以及这个用 Codex 辅助搭建的 AI 作品集助手。这些项目分别覆盖用户理解、AI 创作辅助和 Agent 原型验证。',
     '',
     '---',
     '',
@@ -484,10 +485,19 @@ function formatRoleFitAnswer(question) {
 
 function formatPositioningAnswer() {
   const { positioning, readingPath } = portfolioKnowledge.interviewKnowledge
+  const { profile } = portfolioKnowledge
   return [
     '## 一句话总结',
     '',
     `${positioning.summary}他的核心能力集中在 ${positioning.coreAbilities.join('、')}。`,
+    '',
+    profile.positioning,
+    '',
+    '---',
+    '',
+    '## 工作经历',
+    '',
+    profile.experienceTimeline.map((item) => `**${item.company}（${item.period}）：**${item.role}。主要负责 ${item.work.slice(0, 4).join('、')}。`).join('\n\n'),
     '',
     '---',
     '',
@@ -506,7 +516,7 @@ function formatPositioningAnswer() {
     '## 能力边界',
     '',
     '需要准确说明的是，他的优势是 AI 产品体验设计、复杂系统拆解和原型验证，不应夸大为大模型算法或完整后端架构能力。',
-    ...formatRelatedEvidenceSection(['AI 标签管理与灵魂记忆空间', 'AIGC 发布器', 'AI 作品集助手 Demo', 'B 端后台 / 活动搭投 / 用户反馈运营中枢']),
+    ...formatRelatedEvidenceSection(['灵魂记忆', 'AIGC 发布器', 'Portfolio AI Agent', 'NAWA 编辑器 / 新活动搭投 / 用户声音统一运营中枢']),
   ].join('\n')
 }
 
@@ -571,8 +581,8 @@ function formatProjectDepthAnswer() {
     '',
     '## 对应项目',
     '',
-    'B 端后台、用户反馈运营中枢、0 代码活动搭投、AIGC 发布器后台链路和 AI 标签体系，都能体现这种复杂度。尤其是流程状态、配置效率、数据闭环和设计取舍，是判断项目深度的重点。',
-    ...formatRelatedEvidenceSection(['B 端后台', '用户反馈运营中枢', '0 代码活动搭投', 'AIGC 发布器后台链路', 'AI 标签体系']),
+    'NAWA 编辑器、用户声音统一运营中枢、新活动搭投平台和灵魂记忆，都能体现这种复杂度。尤其是任务模型、流程状态、配置效率、数据闭环和设计取舍，是判断项目深度的重点。',
+    ...formatRelatedEvidenceSection(['NAWA 编辑器', '用户声音统一运营中枢', '新活动搭投平台', '灵魂记忆']),
   ].join('\n')
 }
 
@@ -630,6 +640,39 @@ function formatCapabilityBoundaryAnswer() {
     '## 准确表达',
     '',
     capabilityBoundary.map((item) => `- ${item}`).join('\n'),
+  ].join('\n')
+}
+
+function formatDataBoundaryAnswer() {
+  const { realOnlineData, internalTests, simulations } = portfolioKnowledge.dataBoundaries
+  return [
+    '## 数据与验证边界',
+    '',
+    '需要区分三类证据：真实上线数据、内部小样本测试和方案模拟。它们都能帮助判断设计方向，但不能混为同一种结果。',
+    '',
+    '---',
+    '',
+    '## 真实上线数据',
+    '',
+    realOnlineData.map((item) => `**${item.project}：**${item.data.join('、')}。${item.boundary}`).join('\n\n'),
+    '',
+    '---',
+    '',
+    '## 内部小样本测试',
+    '',
+    internalTests.map((item) => `**${item.project}：**${item.data.join('、')}。${item.boundary}`).join('\n\n'),
+    '',
+    '---',
+    '',
+    '## 方案模拟',
+    '',
+    simulations.map((item) => `**${item.project}：**${item.data.join('、')}。${item.boundary}`).join('\n\n'),
+    '',
+    '---',
+    '',
+    '## 结论',
+    '',
+    '福利积分页的数据可以作为真实上线后的联合验证；灵魂记忆和 NAWA 的测试数据更适合作为方向性证据；灵魂记忆的语音完成率和方案对比必须表述为模拟或预计结果。',
   ].join('\n')
 }
 
@@ -732,12 +775,12 @@ function formatEvidenceMapAnswer(type) {
     '## 项目证据',
     '',
     type === 'commercialization'
-      ? '广告商业化项目能体现他在商业目标、用户体验、配置效率和数据效果之间做平衡的经验。重点不是简单加广告位，而是理解商业内容如何进入社区场景。'
+      ? '多任务福利积分页和 Soul 广告生态设计能体现他在商业目标、用户体验、配置效率和数据效果之间做平衡的经验。重点不是简单加广告位，而是理解商业内容如何进入社区场景。'
       : type === 'contentTools'
-        ? 'AIGC 发布器体现生成、编辑、预览、发布的完整链路；NAWA 编辑器体现创作者工具和复杂资产管理经验。'
+        ? 'AIGC 发布器体现生成、编辑、预览、发布的完整链路；NAWA 编辑器体现创作者工具和复杂事件编排经验。'
         : type === 'socialProduct'
-          ? 'Soul AI 标签和灵魂记忆空间体现他对兴趣社交、用户画像、长期记忆和匹配效率的理解。'
-          : 'AI 作品集助手 Demo 和 Codex 原型搭建过程体现他能把 Agent 体验想法快速做成交互原型。',
+          ? '灵魂记忆体现他对兴趣社交、AI 动态画像、用户控制和匹配效率的理解。'
+          : 'Portfolio AI Agent 和 Codex 原型搭建过程体现他能把 Agent 体验想法快速做成交互原型。',
     '',
     '---',
     '',
@@ -758,11 +801,11 @@ function formatAICapabilityEvaluationAnswer() {
     '',
     '## 项目证据',
     '',
-    '**AI 标签管理与灵魂记忆空间**体现了他对 AI Memory、Persona、Social Match 和用户画像体系的理解。',
+    '**灵魂记忆**体现了他对 AI Memory、Persona、Social Match、AI 信任和用户控制的理解。',
     '',
     '**AIGC 发布器**体现了他对内容生成、编辑、预览、发布完整链路的设计经验。',
     '',
-    '**AI 作品集助手 Demo**体现了他使用 Codex 辅助搭建本地知识库型 Agent 原型的能力。',
+    '**Portfolio AI Agent**体现了他使用 Codex 辅助搭建本地知识库型 Agent 原型的能力。',
     '',
     '---',
     '',
@@ -775,7 +818,7 @@ function formatAICapabilityEvaluationAnswer() {
     '## 能力边界',
     '',
     '当前资料能证明的是 AI 产品体验设计、AI Agent 原型设计、AIGC 工具体验、AI Coding 协作和复杂场景拆解能力。不能夸大为大模型训练、模型微调、向量数据库工程或完整商业级 Agent 平台开发能力。',
-    ...formatRelatedEvidenceSection(['AI 标签管理与灵魂记忆空间', 'AIGC 发布器', 'AI 作品集助手 Demo']),
+    ...formatRelatedEvidenceSection(['灵魂记忆', 'AIGC 发布器', 'Portfolio AI Agent']),
   ].join('\n')
 }
 
@@ -822,7 +865,7 @@ function formatAIEngineeringBoundaryAnswer() {
     '## 不能夸大的部分',
     '',
     '目前资料不能证明他精通大模型训练、模型微调、向量数据库工程或完整后端架构。当前助手也是本地知识库 Demo，不调用外部 API，不是完整商业级 Agent 平台。',
-    ...formatRelatedEvidenceSection(['AI 作品集助手 Demo', 'AI 标签管理与灵魂记忆空间', 'AIGC 发布器']),
+    ...formatRelatedEvidenceSection(['Portfolio AI Agent', '灵魂记忆', 'AIGC 发布器']),
   ].join('\n')
 }
 
@@ -905,13 +948,31 @@ function buildAgentReply(question) {
   const isBEndTopic = includesAny(normalizedQuestion, ['B 端', 'B端', '后台', '平台型', '平台产品', '复杂后台', '复杂系统', '用户反馈', '运营中枢', '活动搭建', '活动搭投'])
   const isCapabilityEvaluationQuestion = includesAny(normalizedQuestion, ['经验怎么样', '经验如何', '项目深度', '深度如何', '能不能', '能否', '是否', '适合', '有没有', '胜任', '扎实', '能力怎么样', '能力如何'])
   const isProjectIntroQuestion = includesAny(normalizedQuestion, ['解决什么', '解决了什么', '设计判断', '介绍', '是什么', '项目背景', '项目价值', '核心问题'])
-  const isWhoOrPositioningQuestion = includesAny(normalizedQuestion, ['左胤是谁', '他是谁', '他的背景', '左胤背景', '核心能力', '核心优势', '个人定位', '3分钟', '三分钟', '快速了解'])
+  const isWhoOrPositioningQuestion = includesAny(normalizedQuestion, ['左胤是谁', '他是谁', '他的背景', '左胤背景', '核心能力', '核心优势', '个人定位', '3分钟', '三分钟', '快速了解', '几年经验', '多少年经验', '哪家公司', '以前在哪', '工作经历', '普通执行', '界面执行', '执行型设计师'])
   const isCapabilityMatrixQuestion = includesAny(normalizedQuestion, ['能力矩阵', '项目证据', '哪些项目能证明', '什么项目能证明', '证明他的能力', '能力证据'])
   const isReadingPathQuestion = includesAny(normalizedQuestion, ['先看什么', '先看哪些', '阅读路径', '怎么看', '看什么项目', '最值得看', '按什么顺序'])
   const isDepthQuestion = includesAny(normalizedQuestion, ['项目深度', '深度如何', '深度怎么样', '复杂度', '页面数量', '项目够深', '项目扎实'])
   const isDesignDecisionQuestion = includesAny(normalizedQuestion, ['设计取舍', '方案取舍', '关键设计判断', '设计判断', '为什么这么做', '方案对比'])
   const isResponsibilityQuestion = includesAny(normalizedQuestion, ['职责', '负责什么', '参与什么', '协作', '落地', '验收', '产出'])
   const isBoundaryQuestion = includesAny(normalizedQuestion, ['能力边界', '边界', '夸大', '算法工程师', '大模型工程', '模型训练', '向量数据库', '后端架构', '数据结果'])
+  const isDataBoundaryQuestion = includesAny(normalizedQuestion, [
+    '真实上线数据',
+    '真实数据',
+    '上线结果',
+    '完整线上结果',
+    '语音完成率',
+    '测试样本',
+    '样本有多少',
+    '因果归因',
+    '严格因果',
+    '单变量',
+    '模拟',
+    '预计',
+    '哪些数据',
+    '数据边界',
+    '福利积分页有哪些真实上线数据',
+    '能否做严格因果归因',
+  ])
   const isAIEngineeringQuestion = includesAny(normalizedQuestion, ['做大模型', '训练模型', '模型训练', '微调模型', '模型微调', '向量数据库', '大模型工程', '懂不懂向量', '会不会训练'])
   const isAIMemorySystemQuestion = includesAny(normalizedQuestion, ['ai memory是什么', 'memory是什么', 'persona是什么', 'socialmatch是什么', 'social match是什么', 'soul项目的ai价值', 'soul 的ai价值', 'ai memory', 'persona', 'socialmatch', 'social match'])
   const isAICapabilityQuestion = (
@@ -962,6 +1023,10 @@ function buildAgentReply(question) {
 
   if (isAssistantIntroQuestion) {
     return formatAssistantIntroAnswer()
+  }
+
+  if (isDataBoundaryQuestion) {
+    return formatDataBoundaryAnswer()
   }
 
   if (isMissingKnowledgeQuestion(question)) {
@@ -1038,7 +1103,7 @@ function buildAgentReply(question) {
   }
 
   if (normalizedQuestion.includes('标签') || normalizedQuestion.includes('灵魂记忆') || normalizedQuestion.includes('引力签') || normalizedQuestion.includes('persona') || normalizedQuestion.includes('memory') || normalizedQuestion.includes('match')) {
-    const project = findProjectByKeyword(['AI 标签', '灵魂记忆'])
+    const project = findProjectByKeyword(['灵魂记忆'])
     return formatProjectAnswer(project)
   }
 
@@ -1053,7 +1118,7 @@ function buildAgentReply(question) {
   }
 
   if (normalizedQuestion.includes('b端') || normalizedQuestion.includes('b 端') || normalizedQuestion.includes('后台') || normalizedQuestion.includes('工单') || normalizedQuestion.includes('活动搭建') || normalizedQuestion.includes('用户反馈')) {
-    const project = findProjectByKeyword(['B 端后台'])
+    const project = findProjectByKeyword(['用户声音', '0 代码', '新活动'])
     return formatProjectAnswer(project)
   }
 
@@ -1061,7 +1126,7 @@ function buildAgentReply(question) {
     return [
       '## 一句话总结',
       '',
-      '最能体现复杂系统能力的项目包括 NAWA 编辑器、B 端后台项目、AI 标签管理与灵魂记忆空间。',
+      '最能体现复杂系统能力的项目包括 NAWA 编辑器、用户声音统一运营中枢和灵魂记忆。',
       '',
       '---',
       '',
@@ -1080,7 +1145,7 @@ function buildAgentReply(question) {
       '## 项目价值',
       '',
       '这类项目能体现他从业务机制到产品结构的抽象能力，也能体现跨团队推动复杂项目落地的经验。',
-      ...formatRelatedEvidenceSection(['NAWA 编辑器', 'B 端后台项目', 'AI 标签管理与灵魂记忆空间']),
+      ...formatRelatedEvidenceSection(['NAWA 编辑器', '用户声音统一运营中枢', '灵魂记忆']),
     ].join('\n')
   }
 

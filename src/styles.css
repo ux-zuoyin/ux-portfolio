@@ -341,3 +341,95 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .agent-message.user-message .agent-avatar,.agent-message.is-user .agent-avatar{display:none}
 @media(max-width:620px){.agent-message.assistant-message .agent-avatar{width:32px;height:32px;flex-basis:32px}}
 @media(max-width:620px){.assistant-drawer-panel{top:calc(18px + env(safe-area-inset-top));height:calc(100dvh - 18px - env(safe-area-inset-top));max-height:calc(100dvh - 18px - env(safe-area-inset-top));border-radius:16px 16px 0 0}.assistant-drawer-topbar{height:80px;padding-top:10px;align-items:center}.assistant-drawer-close{margin-top:0}}
+
+@media(min-width:1001px){
+  .work .project-list{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:28px;
+  }
+  .work .project-glow{
+    width:auto;
+    height:auto;
+    grid-column:auto!important;
+  }
+  .work .project-card{
+    display:flex;
+    flex-direction:column;
+    height:auto;
+    min-height:0;
+    grid-template-columns:none;
+  }
+  .work .project-cover{
+    width:100%;
+    height:auto;
+    min-height:0;
+    padding:0;
+    aspect-ratio:400/250;
+  }
+  .work .project-info{
+    height:auto;
+    min-height:270px;
+    padding:26px 28px 28px;
+  }
+  .work .project-top{
+    margin-bottom:24px;
+  }
+  .work .project-content{
+    width:100%;
+    max-width:none;
+    padding:0!important;
+  }
+  .work .project-content h3{
+    display:-webkit-box!important;
+    width:100%;
+    max-width:none;
+    min-height:0;
+    overflow:hidden;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2!important;
+    font-size:23px;
+    line-height:1.22;
+    margin-bottom:12px;
+  }
+  .work .project-content p{
+    display:-webkit-box!important;
+    width:100%;
+    max-width:none!important;
+    height:auto!important;
+    overflow:hidden;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2!important;
+    font-size:12px;
+    line-height:1.7;
+  }
+  .work .project-tags{
+    width:100%;
+    flex-wrap:nowrap;
+    max-height:24px;
+    overflow:hidden;
+    padding-right:50px;
+  }
+  .work .project-tags span{
+    flex:0 0 auto;
+    height:24px;
+    padding:0 9px;
+    font-size:10px;
+  }
+  .work .project-arrow{
+    right:22px;
+    bottom:24px;
+    width:40px;
+    height:40px;
+  }
+}
+
+@media(min-width:801px){
+  .project-detail .detail-hero{
+    height:94px;
+    min-height:94px;
+    padding-top:0;
+  }
+}

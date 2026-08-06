@@ -34,7 +34,7 @@ export const projects = [
     image: assetUrl('project-memory.webp'),
     detailTitle: '灵魂记忆\nAI动态画像的可信与可控体验设计',
     detailSubtitle: '围绕信息分级、用户确认、画像生成与展示控制，建立一套用户可理解、可纠错、可管理的动态画像体验',
-    assistantBrief: '灵魂记忆空间是围绕 Soul 兴趣社交场景设计的 AI 记忆与用户画像项目，解决用户不愿主动填写资料但平台需要理解用户的问题。左胤负责体验架构、标签体系与画像表达设计，体现 AI 产品体验、用户理解和社交匹配机制设计能力。',
+    assistantBrief: '灵魂记忆是围绕 Soul 兴趣社交场景设计的 AI 动态画像项目，解决 AI 自动理解用户时可能误判、过度标签化和用户失去控制的问题。左胤负责信息分级、候选记忆确认、画像生成与展示控制等体验设计，体现 AI 信任、用户控制、Agent 边界和复杂系统一致性设计能力。',
     detailMedia: Array.from({ length: 9 }, (_, index) => assetUrl(`project-memory/${index + 1}.webp`)),
   }),
   {
@@ -46,7 +46,7 @@ export const projects = [
     image: assetUrl('project-03.webp'),
     accent: '#ff3526',
     category: 'UX体验设计',
-    assistantBrief: '广告激励平台化是围绕任务、激励和转化链路的增长设计项目，解决单点活动复用度低、运营配置成本高的问题。左胤参与激励机制、平台化流程和活动玩法聚合设计，体现增长体验、平台化抽象和业务转化设计能力。',
+    assistantBrief: '多任务福利积分页是商业化激励活动体验项目，解决活动玩法增多后用户难以判断收益、成本和下一步操作的问题。左胤负责数据分析、体验诊断、信息层级、任务状态和活动卡片规则设计，体现增长体验、多任务决策、状态驱动体验和上线数据复盘能力。',
     detailMedia: [1, 2, 8, 9, 10, 11, 12].map((index) => assetUrl(`project-03/2-${index}.webp`)),
   },
   {
@@ -59,7 +59,7 @@ export const projects = [
     accent: '#ff3526',
     detailTitle: '发布器 AI 辅助发帖',
     detailSubtitle: '实现从「不敢发」到「发得好」的体验跃迁',
-    assistantBrief: 'AIGC 发布器是面向社区内容创作的 AI 辅助发布项目，解决用户不知道发什么、担心表达不好和缺少反馈的问题。左胤负责发布链路、AI 辅助节点和确定性反馈体验设计，体现 AIGC 工具、内容生产流程和 AI UX 设计能力。',
+    assistantBrief: 'AIGC 发布器是面向社区内容创作的 AI 辅助发布项目，解决用户不知道发什么、担心表达不好和缺少反馈的问题。左胤负责发布链路、AI 辅助节点、编辑确认和确定性反馈体验设计，体现 AIGC 工具、内容生产流程、用户控制和 AI UX 设计能力。',
     category: 'UX体验设计',
     detailMedia: Array.from({ length: 8 }, (_, index) => {
       const number = index + 1
@@ -87,7 +87,7 @@ export const projects = [
     image: assetUrl('project-02.webp'),
     accent: '#ff3526',
     category: 'UX体验设计',
-    assistantBrief: 'Soul 广告生态设计是商业化与社区体验平衡项目，解决广告转化目标和用户低打扰体验之间的冲突。左胤负责多场景广告适配、信息层级和转化路径设计，体现商业化产品、场景化体验和复杂规则梳理能力。',
+    assistantBrief: 'Soul 广告生态设计是商业化与社区体验平衡项目，解决广告转化目标和用户低打扰体验之间的冲突。左胤负责多场景广告适配、信息层级、转化路径和体验规范设计，体现商业化产品、场景化体验、复杂规则梳理和跨团队协作能力。',
     detailMedia: Array.from({ length: 7 }, (_, index) => {
       const number = index + 1
       return assetUrl(`project-02/2-${number}.webp`)
@@ -95,14 +95,14 @@ export const projects = [
   },
   {
     index: '05',
-    title: '支撑 Soul 主站\n3D 资产全链路管控',
+    title: '支撑 Soul 主站\n3D 资产全链路管控项目总结版',
     meta: 'NAWA · EFFECTCREATOR',
     description: '打通 3D 资产生产、审核、配置与投放流程，提升跨角色协同和内容交付效率。',
     tags: ['3D 资产', '复杂系统', '协同平台'],
     image: assetUrl('project-04.webp'),
     accent: '#ff3526',
     category: '创作者与生产力平台',
-    assistantBrief: 'NAWA 3D 资产全链路管控是面向 3D 资产生产、审核、配置与投放的复杂系统项目，解决多角色协同和资产交付链路分散的问题。左胤负责资产管理流程、编辑器体验和协同链路设计，体现复杂系统、创作者工具和平台型产品设计能力。',
+    assistantBrief: 'NAWA 编辑器是面向 2D 特效、3D 建模和场景配置团队的 B 端专业生产工具项目，解决事件编排难理解、配置易出错和预览不可信的问题。左胤负责驻场调研、任务模型拆解、节点语义、编辑预览闭环和参数模块化设计，体现复杂系统、节点编辑器和专业工具 UX 能力。',
     detailMedia: [
       '1.webp',
       '2.webp',
@@ -134,7 +134,7 @@ export const projects = [
     image: assetUrl('project-05.webp'),
     accent: '#ff3526',
     category: '创作者与生产力平台',
-    assistantBrief: '用户声音统一运营中枢是用户反馈与运营处理后台项目，解决投诉、工单、需求流转分散导致的问题归因和跟进成本。左胤负责反馈处理流程、数据沉淀和跨团队协作体验设计，体现 B 端后台、数据闭环和复杂流程设计能力。',
+    assistantBrief: '用户声音统一运营中枢是面向客服、产品和运营的反馈管理后台，解决反馈、投诉和需求流转分散导致的问题归因与跟进成本。左胤负责反馈处理流程、分类检索、状态流转、数据沉淀和跨团队协作体验设计，体现 B 端后台、多角色协同和数据闭环能力。',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-05/${index + 1}.mp4`)),
   },
   {
@@ -146,7 +146,16 @@ export const projects = [
     image: assetUrl('project-06.webp'),
     accent: '#ff3526',
     category: '创作者与生产力平台',
-    assistantBrief: '0 代码活动快速搭建是面向运营活动配置的低代码平台项目，解决活动上线依赖研发、配置效率低和资产难复用的问题。左胤负责可视化搭建流程、组件化配置和发布链路设计，体现 B 端工具、平台化能力和运营效率设计能力。',
+    assistantBrief: '0 代码活动快速搭建是面向运营活动配置的低代码平台项目，解决活动上线依赖研发、配置效率低、重复操作和资产难复用的问题。左胤负责页面搭建、组件化配置、预览发布和复杂规则约束设计，体现 B 端工具、低代码搭建、平台化能力和运营效率设计能力。',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.mp4`)),
   },
+  createProjectTemplate('09', {
+    title: '降低复杂事件编排的理解与配置成本',
+    description: '重点重构事件编排体验，同步优化结果预览与高频配置流程',
+    tags: ['驻场调研', '体验诊断', '体验设计'],
+    image: assetUrl('project-09/cover.webp'),
+    detailTitle: '降低复杂事件编排的理解与配置成本',
+    detailSubtitle: '重点重构事件编排体验，同步优化结果预览与高频配置流程',
+    category: '创作者与生产力平台',
+  }),
 ]

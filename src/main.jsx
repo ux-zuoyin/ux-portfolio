@@ -13,6 +13,17 @@ import { projects, projectCategories } from './data/projects'
 gsap.registerPlugin(ScrollTrigger)
 
 const scrollToPageTop = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+const detailReturnTargetKey = 'portfolio:return-to-work'
+
+const markDetailReturnToWork = () => {
+  window.sessionStorage.setItem(detailReturnTargetKey, '1')
+}
+
+const consumeDetailReturnToWork = () => {
+  const shouldReturnToWork = window.sessionStorage.getItem(detailReturnTargetKey) === '1'
+  if (shouldReturnToWork) window.sessionStorage.removeItem(detailReturnTargetKey)
+  return shouldReturnToWork
+}
 
 const capabilities = [
   ['01', '复杂系统体验设计', '从业务目标、角色关系到关键链路，建立可解释、可扩展的产品体验框架。'],
@@ -53,9 +64,11 @@ function HomePage() {
   const [toastSuccess, setToastSuccess] = useState(true)
   const [toastMessage, setToastMessage] = useState('')
   const [activeProjectCategory, setActiveProjectCategory] = useState('全部')
-  const visibleProjects = activeProjectCategory === '全部'
+  const visibleProjects = (activeProjectCategory === '全部'
     ? projects
-    : projects.filter((project) => project.category === activeProjectCategory)
+    : projects.filter((project) => project.category === activeProjectCategory))
+    .slice()
+    .sort((a, b) => Number(a.index) - Number(b.index))
 
   const jumpToProjectCategory = (category) => {
     setActiveProjectCategory(category)
@@ -154,7 +167,20 @@ function HomePage() {
     const root = appRef.current
     if (!root) return
 
+    const shouldReturnToWork = consumeDetailReturnToWork()
     const shouldSkipHomeMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 800px)').matches
+    if (shouldReturnToWork) {
+      gsap.set(root.querySelectorAll('.nav, .hero-eyebrow-mask, .hero-title-mask, .hero-subtitle-mask, .hero-actions'), { visibility: 'visible' })
+      gsap.set(root.querySelectorAll('.opening-curtain'), { display: 'none' })
+      gsap.set(root.querySelectorAll('.hero-media, .motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
+      const scrollFrame = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          document.getElementById('work')?.scrollIntoView({ behavior: 'auto', block: 'start' })
+        })
+      })
+      return () => window.cancelAnimationFrame(scrollFrame)
+    }
+
     if (shouldSkipHomeMotion) {
       gsap.set(root.querySelectorAll('.nav, .hero-eyebrow-mask, .hero-title-mask, .hero-subtitle-mask, .hero-actions'), { visibility: 'visible' })
       gsap.set(root.querySelectorAll('.opening-curtain'), { display: 'none' })
@@ -239,7 +265,7 @@ function HomePage() {
           <div className="hero-heading-stage">
             <div className="hero-title-mask"><h1 className="hero-main-title">Hi，我是左胤</h1></div>
             <div className="hero-subtitle-mask">
-              <p className="hero-statement">9年UX设计经验，前 Soul UX 设计师。<br />聚焦 AI 产品体验与复杂系统设计，擅长将 AI 能力转化为用户可理解、可信任、可持续使用的产品体验</p>
+              <p className="hero-statement">10年UX设计经验，前 Soul UX 设计师。<br />聚焦 AI 产品体验与复杂系统设计，擅长将 AI 能力转化为用户可理解、可信任、可持续使用的产品体验</p>
             </div>
           </div>
           <div className="hero-actions">
@@ -256,11 +282,11 @@ function HomePage() {
       <div className="motion-title" aria-hidden="true">EXPERIENCE</div>
       <div className="section-label">01 / EXPERIENCE</div>
       <div className="experience-intro">
-        <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>9年设计实践，<br/>聚焦UX产品体验设计。</h2></div>
+        <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>10年设计实践，<br/>聚焦UX产品体验设计。</h2></div>
         <p>曾负责 Soul App 核心业务体验设计，覆盖内容创作、广告商业化、增长、3D资产平台与 AI 记忆 / 用户画像探索。<br/><br/>我的优势是从复杂业务问题出发，梳理产品机制与系统链路，并将 AI 能力转化为清晰、自然、可信任的用户体验。</p>
       </div>
       <div className="stats">
-          <div data-stagger-item><strong>9<sup>+</sup></strong><span>年设计经验</span></div><div data-stagger-item><strong>4<sup>+</sup></strong><span>业务领域</span></div><div data-stagger-item><strong>30<sup>+</sup></strong><span>核心项目</span></div><div data-stagger-item><strong>0→1<sup className="stat-spacer" aria-hidden="true">+</sup></strong><span>复杂产品搭建</span></div>
+          <div data-stagger-item><strong>10<sup>+</sup></strong><span>年设计经验</span></div><div data-stagger-item><strong>4<sup>+</sup></strong><span>业务领域</span></div><div data-stagger-item><strong>30<sup>+</sup></strong><span>核心项目</span></div><div data-stagger-item><strong>0→1<sup className="stat-spacer" aria-hidden="true">+</sup></strong><span>复杂产品搭建</span></div>
       </div>
       <div className="experience">
         <div className="experience-title">CAREER PATH <span>2016 — 2026</span></div>
@@ -305,7 +331,7 @@ function HomePage() {
               <div className="project-info">
                 <div className="project-top"><span>{p.index}</span><span>{p.meta}</span></div>
                 <div className="project-content">
-                  <h3>{p.title.split('\n').map((line,i)=><React.Fragment key={line}>{line}{i===0&&<br/>}</React.Fragment>)}</h3>
+                  <h3>{p.title.replace(/\n/g, ' ')}</h3>
                   <p>{p.description}</p>
                   <div className="project-tags" aria-label="项目标签">{p.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                 </div>
@@ -391,9 +417,6 @@ function ProjectDetail({ project }) {
   const detailRef = useRef(null)
   const [isNavScrolled, setIsNavScrolled] = useState(false)
   const [isAssistantOpen, setIsAssistantOpen] = useState(false)
-  const projectIndex = projects.findIndex((item) => item.index === project.index)
-  const previousProject = projects[(projectIndex - 1 + projects.length) % projects.length]
-  const nextProject = projects[(projectIndex + 1) % projects.length]
 
   useEffect(() => {
     const updateNav = () => setIsNavScrolled(window.scrollY > 80)
@@ -411,12 +434,6 @@ function ProjectDetail({ project }) {
     }
 
     const context = gsap.context(() => {
-      const timeline = gsap.timeline({ defaults: { ease: 'power4.out' } })
-      timeline
-        .fromTo('.detail-carousel', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 0.05)
-        .fromTo('.detail-current .detail-cover-card', { clipPath: 'inset(0 100% 0 0)', scale: 1.03 }, { clipPath: 'inset(0 0% 0 0)', scale: 1, duration: 0.9 }, 0.15)
-        .fromTo('.detail-current .detail-slide-copy', { x: 32, opacity: 0 }, { x: 0, opacity: 1, duration: 0.75 }, 0.3)
-
       gsap.utils.toArray('.detail-media-item').forEach((item) => {
         gsap.fromTo(item, { y: 52, opacity: 0, clipPath: 'inset(0 0 10% 0)' }, {
           y: 0,
@@ -438,29 +455,9 @@ function ProjectDetail({ project }) {
   return <main className="project-detail" ref={detailRef}>
     <section className="detail-hero">
       <header className={`detail-nav shell${isNavScrolled ? ' nav-scrolled' : ''}`}>
-        <a className="brand" href="#work">SARDINE DESIGN</a>
-        <a className="detail-back" href="#work"><ArrowLeft size={16}/> 返回项目列表</a>
+        <a className="brand" href="#work" onClick={markDetailReturnToWork}>SARDINE DESIGN</a>
+        <a className="detail-back" href="#work" onClick={markDetailReturnToWork}><ArrowLeft size={16}/> 返回项目列表</a>
       </header>
-      <div className="detail-carousel" aria-label="项目切换">
-        <a className="detail-slide detail-side detail-previous" href={`#project-${previousProject.index}`} aria-label={`上一个项目：${previousProject.title.replace('\n', ' ')}`}>
-          <img src={previousProject.image} alt=""/>
-          <div><strong>{previousProject.title.split('\n')[0]}</strong><span>{previousProject.meta}</span></div>
-        </a>
-        <article className="detail-slide detail-current">
-          <div className="detail-cover-card"><img src={project.image} alt={`${project.title.replace('\n', ' ')}封面`}/></div>
-          <div className="detail-slide-copy">
-            <h1>{(project.detailTitle || project.title.replace('\n', ' ')).split(' ').map((part) => <span className="detail-title-mask" key={part}><span className="detail-title-line">{part}</span></span>)}</h1>
-            <p className="detail-subtitle">{project.detailSubtitle || project.description}</p>
-            <div className="detail-tags" aria-label="项目标签">
-              {project.tags.map((tag) => <span key={tag}>{tag}</span>)}
-            </div>
-          </div>
-        </article>
-        <a className="detail-slide detail-side detail-next" href={`#project-${nextProject.index}`} aria-label={`下一个项目：${nextProject.title.replace('\n', ' ')}`}>
-          <img src={nextProject.image} alt=""/>
-          <div><strong>{nextProject.title.split('\n')[0]}</strong><span>{nextProject.meta}</span></div>
-        </a>
-      </div>
     </section>
 
     <section className="detail-body">
@@ -516,6 +513,9 @@ function App() {
       const isCrossingHomeBoundary = Boolean(activeProjectIndexRef.current) !== Boolean(nextProjectIndex)
 
       if (isCrossingHomeBoundary) {
+        if (activeProjectIndexRef.current && !nextProjectIndex) {
+          markDetailReturnToWork()
+        }
         window.location.reload()
         return
       }

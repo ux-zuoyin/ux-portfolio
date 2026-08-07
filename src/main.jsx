@@ -5,9 +5,10 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
 import BorderGlow from './components/BorderGlow'
+import DotField from './components/DotField'
 import TiltedCard from './components/TiltedCard'
 import TargetCursor from './components/TargetCursor'
-import AIPortfolioAgent, { AIPortfolioAssistantDrawer, PortfolioAssistantFab } from './components/AIPortfolioAgent'
+import { AIPortfolioAssistantDrawer, PortfolioAssistantFab } from './components/AIPortfolioAgent'
 import { projects, projectCategories } from './data/projects'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -32,21 +33,31 @@ const capabilities = [
   ['04', '跨团队推动落地', '连接产品、研发、算法和运营，用原型与设计策略推动复杂项目持续交付。'],
 ]
 
+const projectCount = projects.length
+const paddedProjectCount = String(projectCount).padStart(2, '0')
+
 function Nav() {
   const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
-    const updateNav = () => setIsScrolled(window.scrollY > 80)
+    const updateNav = () => {
+      const heroHeight = document.querySelector('.hero')?.offsetHeight || window.innerHeight
+      setIsScrolled(window.scrollY >= heroHeight - 94)
+    }
     updateNav()
     window.addEventListener('scroll', updateNav, { passive: true })
-    return () => window.removeEventListener('scroll', updateNav)
+    window.addEventListener('resize', updateNav)
+    return () => {
+      window.removeEventListener('scroll', updateNav)
+      window.removeEventListener('resize', updateNav)
+    }
   }, [])
 
   return <>
     <header className={`nav shell${isScrolled ? ' nav-scrolled' : ''}`}>
       <a className="brand" href="#top">SARDINE DESIGN</a>
       <nav>
-        <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × 8</a><a href="#strength">个人优势</a>
+        <a href="#top">首页</a><a href="#experience">经历</a><a href="#work">项目 × {projectCount}</a><a href="#strength">个人优势</a>
       </nav>
       <a className="nav-contact" href="#contact">联系我 <ArrowUpRight size={16}/></a>
     </header>
@@ -55,27 +66,23 @@ function Nav() {
 }
 
 function HomePage() {
-  const heroVideoRef = useRef(null)
   const appRef = useRef(null)
   const toastTimerRef = useRef(null)
   const [isAssistantOpen, setIsAssistantOpen] = useState(false)
   const [hasPassedHero, setHasPassedHero] = useState(false)
+  const [isHeroDimmed, setIsHeroDimmed] = useState(false)
   const [toastVisible, setToastVisible] = useState(false)
   const [toastSuccess, setToastSuccess] = useState(true)
   const [toastMessage, setToastMessage] = useState('')
   const [activeProjectCategory, setActiveProjectCategory] = useState('全部')
   const visibleProjects = (activeProjectCategory === '全部'
     ? projects
-    : projects.filter((project) => project.category === activeProjectCategory))
+    : projects.filter((project) => (
+      project.category === activeProjectCategory
+      || project.categories?.includes(activeProjectCategory)
+    )))
     .slice()
     .sort((a, b) => Number(a.index) - Number(b.index))
-
-  const jumpToProjectCategory = (category) => {
-    setActiveProjectCategory(category)
-    window.requestAnimationFrame(() => {
-      document.getElementById('work')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    })
-  }
 
   const showCopyToast = (message, success) => {
     window.clearTimeout(toastTimerRef.current)
@@ -137,29 +144,19 @@ function HomePage() {
     )
   }
 
-  useEffect(() => {
-    const video = heroVideoRef.current
-    if (!video) return
-
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) video.play().catch(() => {})
-      else video.pause()
-    }, { threshold: 0.1 })
-
-    observer.observe(video)
-    return () => observer.disconnect()
-  }, [])
-
   useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
 
   useEffect(() => {
-    const updateAssistantFab = () => setHasPassedHero(window.scrollY > window.innerHeight * 0.9)
-    updateAssistantFab()
-    window.addEventListener('scroll', updateAssistantFab, { passive: true })
-    window.addEventListener('resize', updateAssistantFab)
+    const updateScrollState = () => {
+      setHasPassedHero(window.scrollY > window.innerHeight * 0.9)
+      setIsHeroDimmed(window.scrollY > 8)
+    }
+    updateScrollState()
+    window.addEventListener('scroll', updateScrollState, { passive: true })
+    window.addEventListener('resize', updateScrollState)
     return () => {
-      window.removeEventListener('scroll', updateAssistantFab)
-      window.removeEventListener('resize', updateAssistantFab)
+      window.removeEventListener('scroll', updateScrollState)
+      window.removeEventListener('resize', updateScrollState)
     }
   }, [])
 
@@ -170,9 +167,8 @@ function HomePage() {
     const shouldReturnToWork = consumeDetailReturnToWork()
     const shouldSkipHomeMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 800px)').matches
     if (shouldReturnToWork) {
-      gsap.set(root.querySelectorAll('.nav, .hero-eyebrow-mask, .hero-title-mask, .hero-subtitle-mask, .hero-actions'), { visibility: 'visible' })
       gsap.set(root.querySelectorAll('.opening-curtain'), { display: 'none' })
-      gsap.set(root.querySelectorAll('.hero-media, .motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
+      gsap.set(root.querySelectorAll('.motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
       const scrollFrame = window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
           document.getElementById('work')?.scrollIntoView({ behavior: 'auto', block: 'start' })
@@ -182,9 +178,8 @@ function HomePage() {
     }
 
     if (shouldSkipHomeMotion) {
-      gsap.set(root.querySelectorAll('.nav, .hero-eyebrow-mask, .hero-title-mask, .hero-subtitle-mask, .hero-actions'), { visibility: 'visible' })
       gsap.set(root.querySelectorAll('.opening-curtain'), { display: 'none' })
-      gsap.set(root.querySelectorAll('.hero-media, .motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
+      gsap.set(root.querySelectorAll('.motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
       return
     }
 
@@ -192,16 +187,10 @@ function HomePage() {
       const opening = gsap.timeline({ defaults: { ease: 'power4.out' } })
 
       opening
-        .set('.nav, .hero-eyebrow-mask, .hero-title-mask, .hero-subtitle-mask, .hero-actions', { visibility: 'visible' })
         .fromTo('.opening-mark', { yPercent: 130, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.75 }, 0.1)
         .fromTo('.opening-line', { scaleX: 0 }, { scaleX: 1, duration: 0.9 }, 0.18)
         .to('.opening-mark', { yPercent: -80, opacity: 0, duration: 0.5, ease: 'power3.in' }, 0.95)
         .to('.opening-curtain', { yPercent: -101, duration: 1.15, ease: 'power4.inOut' }, 1.08)
-        .fromTo('.hero-media', { scale: 1.1 }, { scale: 1, duration: 1.9 }, 1.08)
-        .fromTo('.nav', { y: -24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, 1.42)
-        .fromTo('.hero-eyebrow-mask .eyebrow', { yPercent: 100 }, { yPercent: 0, duration: 0.75 }, 1.55)
-        .set('.hero-title-mask', { overflow: 'visible' }, 1.65)
-        .fromTo('.hero-actions', { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 2.1)
 
       gsap.utils.toArray('[data-motion-section]').forEach((section) => {
         const title = section.querySelector('.motion-title')
@@ -248,34 +237,29 @@ function HomePage() {
   }, [])
 
   return <main id="top" ref={appRef}>
-    <section className="hero">
-      <video ref={heroVideoRef} className="hero-media" autoPlay muted loop playsInline preload="auto" poster={`${import.meta.env.BASE_URL}assets/hero-cover.webp`}>
-        <source src={`${import.meta.env.BASE_URL}assets/hero-video.mp4`} type="video/mp4" />
-      </video>
-      <div className="hero-shade" />
-      <div className="hero-frost" />
+    <section className={`hero${isHeroDimmed ? ' is-dimmed' : ''}`}>
+      <img className="hero-blocks" src={`${import.meta.env.BASE_URL}assets/hero-blocks.png`} alt="" aria-hidden="true" />
+      <DotField
+        className="hero-dot-field"
+        aria-hidden="true"
+        dotRadius={1.5}
+        dotSpacing={14}
+        bulgeStrength={67}
+        glowRadius={180}
+        gradientFrom="rgba(85, 0, 195, 0.52)"
+        gradientTo="rgba(185, 156, 255, 0.24)"
+        glowColor="rgba(85, 0, 195, 0.32)"
+      />
+      <img className="hero-subject" src={`${import.meta.env.BASE_URL}assets/hero-subject.png`} alt="" aria-hidden="true" fetchPriority="high" />
+      <img className="site-header-image" src={`${import.meta.env.BASE_URL}assets/header.png`} alt="DESIGN BY SARDINE · UX体验设计 / 个人设计网站" />
       <div className="opening-curtain" aria-hidden="true">
         <div className="opening-mark">SARDINE DESIGN <span>PORTFOLIO 2026</span></div>
         <i className="opening-line" />
       </div>
       <Nav />
-      <div className="hero-content shell">
-        <div className="hero-copy">
-          <div className="hero-eyebrow-mask"><div className="eyebrow">AI PRODUCT DESIGN / UX EXPERIENCE</div></div>
-          <div className="hero-heading-stage">
-            <div className="hero-title-mask"><h1 className="hero-main-title">Hi，我是左胤</h1></div>
-            <div className="hero-subtitle-mask">
-              <p className="hero-statement">10年UX设计经验，前 Soul UX 设计师。<br />聚焦 AI 产品体验与复杂系统设计，擅长将 AI 能力转化为用户可理解、可信任、可持续使用的产品体验</p>
-            </div>
-          </div>
-          <div className="hero-actions">
-            <button type="button" className="hero-primary" onClick={() => jumpToProjectCategory('全部')}>查看全部作品</button>
-          </div>
-        </div>
-      </div>
+      <img className="site-footer-image" src={`${import.meta.env.BASE_URL}assets/footer.png`} alt="© 沙丁鱼" />
+      <div className="hero-scroll-overlay" aria-hidden="true" />
     </section>
-
-    <AIPortfolioAgent onOpen={() => setIsAssistantOpen(true)} />
 
     <section className="experience-section section" id="experience" data-motion-section>
       <div className="shell">
@@ -300,8 +284,8 @@ function HomePage() {
     <section className="work section" id="work" data-motion-section>
       <div className="shell">
         <div className="motion-title" aria-hidden="true">PROJECTS</div>
-        <div className="section-label">02 / PROJECTS · 08</div>
-        <div className="section-heading"><h2>八个项目，八种<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
+        <div className="section-label">02 / PROJECTS · {paddedProjectCount}</div>
+        <div className="section-heading"><h2>多个项目，多个<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
         <div className="project-tabs" role="tablist" aria-label="项目分类">
           {projectCategories.map((category) => <button
             className={activeProjectCategory === category ? 'is-active' : ''}
@@ -362,7 +346,6 @@ function HomePage() {
           <button className="contact-primary" type="button" onClick={copyWechat} data-stagger-item><MessageCircle size={16}/> 获取微信联系方式</button>
           <a className="contact-secondary" href="tel:18621918554" data-stagger-item><Phone size={15}/> 186 2191 8554</a>
         </div>
-        <div className="footer-row"><span>WECHAT · SARDINE0717</span><span>SHANGHAI · CHINA</span><span>© 2026 ZUO YIN</span></div>
       </div>
     </footer>
     <div className={`copy-toast${toastVisible ? ' is-visible' : ''}${toastSuccess ? '' : ' is-error'}`} role="status" aria-live="polite">

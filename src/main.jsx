@@ -34,8 +34,6 @@ const capabilities = [
 ]
 
 const projectCount = projects.length
-const paddedProjectCount = String(projectCount).padStart(2, '0')
-
 function Nav() {
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -61,16 +59,20 @@ function Nav() {
       </nav>
       <a className="nav-contact" href="#contact">联系我 <ArrowUpRight size={16}/></a>
     </header>
-    <div className="nav-spacer" aria-hidden="true"/>
   </>
 }
 
 function HomePage() {
   const appRef = useRef(null)
+  const heroTitleRef = useRef(null)
+  const strengthRef = useRef(null)
+  const contactRef = useRef(null)
   const toastTimerRef = useRef(null)
   const [isAssistantOpen, setIsAssistantOpen] = useState(false)
   const [hasPassedHero, setHasPassedHero] = useState(false)
   const [isHeroDimmed, setIsHeroDimmed] = useState(false)
+  const [isFinalPage, setIsFinalPage] = useState(false)
+  const [isStrengthActive, setIsStrengthActive] = useState(false)
   const [toastVisible, setToastVisible] = useState(false)
   const [toastSuccess, setToastSuccess] = useState(true)
   const [toastMessage, setToastMessage] = useState('')
@@ -148,8 +150,17 @@ function HomePage() {
 
   useEffect(() => {
     const updateScrollState = () => {
+      const titleScrollProgress = Math.min(window.scrollY / Math.max(window.innerHeight * 0.55, 1), 1)
+      if (heroTitleRef.current) {
+        heroTitleRef.current.style.setProperty('--hero-title-scroll-y', `${-titleScrollProgress * window.innerHeight * 0.2}px`)
+        heroTitleRef.current.style.setProperty('--hero-title-opacity', String(1 - titleScrollProgress))
+      }
+      const hasReachedStrength = strengthRef.current?.getBoundingClientRect().top <= window.innerHeight * 0.68
+      const hasReachedContact = contactRef.current?.getBoundingClientRect().top <= window.innerHeight * 0.65
       setHasPassedHero(window.scrollY > window.innerHeight * 0.9)
-      setIsHeroDimmed(window.scrollY > 8)
+      setIsFinalPage(Boolean(hasReachedContact))
+      setIsStrengthActive(Boolean(hasReachedStrength))
+      setIsHeroDimmed(window.scrollY > window.innerHeight * 0.55 && !hasReachedContact)
     }
     updateScrollState()
     window.addEventListener('scroll', updateScrollState, { passive: true })
@@ -167,7 +178,6 @@ function HomePage() {
     const shouldReturnToWork = consumeDetailReturnToWork()
     const shouldSkipHomeMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(max-width: 800px)').matches
     if (shouldReturnToWork) {
-      gsap.set(root.querySelectorAll('.opening-curtain'), { display: 'none' })
       gsap.set(root.querySelectorAll('.motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
       const scrollFrame = window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
@@ -178,25 +188,17 @@ function HomePage() {
     }
 
     if (shouldSkipHomeMotion) {
-      gsap.set(root.querySelectorAll('.opening-curtain'), { display: 'none' })
       gsap.set(root.querySelectorAll('.motion-title, [data-stagger-item]'), { clearProps: 'transform,opacity,clipPath' })
       return
     }
 
     const context = gsap.context(() => {
-      const opening = gsap.timeline({ defaults: { ease: 'power4.out' } })
-
-      opening
-        .fromTo('.opening-mark', { yPercent: 130, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.75 }, 0.1)
-        .fromTo('.opening-line', { scaleX: 0 }, { scaleX: 1, duration: 0.9 }, 0.18)
-        .to('.opening-mark', { yPercent: -80, opacity: 0, duration: 0.5, ease: 'power3.in' }, 0.95)
-        .to('.opening-curtain', { yPercent: -101, duration: 1.15, ease: 'power4.inOut' }, 1.08)
-
       gsap.utils.toArray('[data-motion-section]').forEach((section) => {
         const title = section.querySelector('.motion-title')
         const heading = section.querySelector('.section-label, .contact-inner > h3')
         const intro = section.querySelector('.experience-intro, .section-heading')
         const cards = section.querySelectorAll('[data-stagger-item]')
+        const isContact = section.classList.contains('contact')
 
         const timeline = gsap.timeline({
           scrollTrigger: {
@@ -207,7 +209,12 @@ function HomePage() {
           defaults: { ease: 'power4.out' },
         })
 
-        if (title) {
+        if (isContact) {
+          timeline.fromTo(section.querySelector('.contact-inner'),
+            { yPercent: 64 },
+            { yPercent: 0, duration: 1.2, ease: 'power4.out' },
+          )
+        } else if (title) {
           if (section.classList.contains('experience-section')) {
             timeline.fromTo(title,
               { y: 28, opacity: 0 },
@@ -220,9 +227,9 @@ function HomePage() {
             )
           }
         }
-        if (heading) timeline.fromTo(heading, { y: 44, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, '-=0.8')
+        if (heading && !isContact) timeline.fromTo(heading, { y: 44, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 }, '-=0.8')
         if (intro) timeline.fromTo(intro, { y: 72, opacity: 0 }, { y: 0, opacity: 1, duration: 1.15 }, '-=0.65')
-        if (cards.length) {
+        if (cards.length && !isContact) {
           timeline.fromTo(cards,
             { y: 64, opacity: 0, clipPath: 'inset(0 0 14% 0)' },
             { y: 0, opacity: 1, clipPath: 'inset(0 0 0% 0)', duration: 0.9, stagger: 0.1 },
@@ -237,6 +244,7 @@ function HomePage() {
   }, [])
 
   return <main id="top" ref={appRef}>
+    <Nav />
     <section className={`hero${isHeroDimmed ? ' is-dimmed' : ''}`}>
       <img className="hero-blocks" src={`${import.meta.env.BASE_URL}assets/hero-blocks.png`} alt="" aria-hidden="true" />
       <DotField
@@ -250,21 +258,21 @@ function HomePage() {
         gradientTo="rgba(185, 156, 255, 0.24)"
         glowColor="rgba(85, 0, 195, 0.32)"
       />
-      <img className="hero-subject" src={`${import.meta.env.BASE_URL}assets/hero-subject.png`} alt="" aria-hidden="true" fetchPriority="high" />
-      <img className="site-header-image" src={`${import.meta.env.BASE_URL}assets/header.png`} alt="DESIGN BY SARDINE · UX体验设计 / 个人设计网站" />
-      <div className="opening-curtain" aria-hidden="true">
-        <div className="opening-mark">SARDINE DESIGN <span>PORTFOLIO 2026</span></div>
-        <i className="opening-line" />
+      <div ref={heroTitleRef} className="shell hero-text-container">
+        <img className="hero-welcome" src={`${import.meta.env.BASE_URL}assets/hero-welcome.png`} alt="欢迎光临" />
+        <img className="hero-brand" src={`${import.meta.env.BASE_URL}assets/hero-brand.png`} alt="沙丁鱼设计小卖铺" />
       </div>
-      <Nav />
-      <img className="site-footer-image" src={`${import.meta.env.BASE_URL}assets/footer.png`} alt="© 沙丁鱼" />
+      <img className="hero-header-left" src={`${import.meta.env.BASE_URL}assets/header-left.png`} alt="" />
+      <img className="hero-header-right" src={`${import.meta.env.BASE_URL}assets/header-right.png`} alt="" />
+      <img className="hero-footer-left" src={`${import.meta.env.BASE_URL}assets/footer-left.png`} alt="" />
+      <img className="hero-footer-right" src={`${import.meta.env.BASE_URL}assets/footer-right.png`} alt="" />
+      <img className={`hero-subject hero-subject-default${isStrengthActive || isFinalPage ? ' is-hidden' : ''}`} src={`${import.meta.env.BASE_URL}assets/hero-subject.png`} alt="" aria-hidden="true" fetchPriority="high" />
+      <img className={`hero-subject hero-subject-like${isStrengthActive || isFinalPage ? ' is-visible' : ''}`} src={`${import.meta.env.BASE_URL}assets/hero-subject-like.png`} alt="" aria-hidden="true" />
       <div className="hero-scroll-overlay" aria-hidden="true" />
     </section>
 
     <section className="experience-section section" id="experience" data-motion-section>
       <div className="shell">
-      <div className="motion-title" aria-hidden="true">EXPERIENCE</div>
-      <div className="section-label">01 / EXPERIENCE</div>
       <div className="experience-intro">
         <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>10年设计实践，<br/>聚焦UX产品体验设计。</h2></div>
         <p>曾负责 Soul App 核心业务体验设计，覆盖内容创作、广告商业化、增长、3D资产平台与 AI 记忆 / 用户画像探索。<br/><br/>我的优势是从复杂业务问题出发，梳理产品机制与系统链路，并将 AI 能力转化为清晰、自然、可信任的用户体验。</p>
@@ -283,8 +291,6 @@ function HomePage() {
 
     <section className="work section" id="work" data-motion-section>
       <div className="shell">
-        <div className="motion-title" aria-hidden="true">PROJECTS</div>
-        <div className="section-label">02 / PROJECTS · {paddedProjectCount}</div>
         <div className="section-heading"><h2>多个项目，多个<br/>复杂问题的解法。</h2><p>SELECTED CASES<br/>2021 — 2026</p></div>
         <div className="project-tabs" role="tablist" aria-label="项目分类">
           {projectCategories.map((category) => <button
@@ -327,10 +333,8 @@ function HomePage() {
       </div>
     </section>
 
-    <section className="strength section" id="strength" data-motion-section>
+    <section ref={strengthRef} className="strength section" id="strength" data-motion-section>
       <div className="shell">
-      <div className="motion-title" aria-hidden="true">CAPABILITY</div>
-      <div className="section-label">03 / CAPABILITY</div>
       <div className="section-heading"><h2>不止是界面，<br/>更是系统与结果。</h2><p>HOW I<br/>CREATE VALUE</p></div>
       <div className="capability-grid">
         {capabilities.map(([n,t,d])=><article key={n} data-stagger-item><span>{n}</span><Sparkles size={24}/><h3>{t}</h3><p>{d}</p></article>)}
@@ -338,9 +342,8 @@ function HomePage() {
       </div>
     </section>
 
-    <footer className="contact" id="contact" data-motion-section>
+    <footer ref={contactRef} className="contact" id="contact" data-motion-section>
       <div className="contact-grid"/><div className="shell contact-inner">
-        <div className="motion-title" aria-hidden="true">CONTACT</div>
         <h3>期待与新产品团队一起，<br/>把体验做得更可靠、更包容、更有竞争力。</h3>
         <div className="contact-actions">
           <button className="contact-primary" type="button" onClick={copyWechat} data-stagger-item><MessageCircle size={16}/> 获取微信联系方式</button>
@@ -351,7 +354,7 @@ function HomePage() {
     <div className={`copy-toast${toastVisible ? ' is-visible' : ''}${toastSuccess ? '' : ' is-error'}`} role="status" aria-live="polite">
       {toastSuccess ? <Check size={17}/> : <AlertCircle size={17}/>}<span>{toastMessage}</span>
     </div>
-    {hasPassedHero && <PortfolioAssistantFab onOpen={() => setIsAssistantOpen(true)} />}
+    {hasPassedHero && <PortfolioAssistantFab className="home-assistant-fab" onOpen={() => setIsAssistantOpen(true)} />}
     <AIPortfolioAssistantDrawer isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />
   </main>
 }
@@ -445,7 +448,6 @@ function ProjectDetail({ project }) {
 
     <section className="detail-body">
       <div className="shell detail-intro">
-        <div className="section-label">CASE STUDY / OVERVIEW</div>
         <div className="detail-intro-grid">
           <h2>{project.title.split('\n').map((line) => <React.Fragment key={line}>{line}<br/></React.Fragment>)}</h2>
           <p>{project.description}</p>

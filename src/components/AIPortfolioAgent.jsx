@@ -1552,33 +1552,6 @@ export default function AIPortfolioAgent({ onOpen }) {
 }
 
 export function AIPortfolioAssistantDrawer({ isOpen, onClose }) {
-  useEffect(() => {
-    if (!isOpen) return undefined
-
-    const scrollY = window.scrollY
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-    const previousDocumentOverflow = document.documentElement.style.overflow
-    const previousBodyStyle = {
-      overflow: document.body.style.overflow,
-      paddingRight: document.body.style.paddingRight,
-    }
-
-    document.documentElement.style.overflow = 'hidden'
-    document.body.style.overflow = 'hidden'
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`
-    }
-
-    return () => {
-      document.documentElement.style.overflow = previousDocumentOverflow
-      document.body.style.overflow = previousBodyStyle.overflow
-      document.body.style.paddingRight = previousBodyStyle.paddingRight
-      if (window.scrollY !== scrollY) {
-        window.scrollTo({ top: scrollY, left: 0, behavior: 'auto' })
-      }
-    }
-  }, [isOpen])
-
   return <>
     <div className={`assistant-drawer${isOpen ? ' is-open' : ''}`} aria-hidden={!isOpen}>
       <button className="assistant-drawer-backdrop" type="button" aria-label="关闭作品集助手背景层" onClick={onClose} />
@@ -1598,8 +1571,8 @@ export function AIPortfolioAssistantDrawer({ isOpen, onClose }) {
   </>
 }
 
-export function PortfolioAssistantFab({ onOpen }) {
-  return <button type="button" className="portfolio-assistant-fab" onClick={onOpen}>
+export function PortfolioAssistantFab({ onOpen, className = '' }) {
+  return <button type="button" className={`portfolio-assistant-fab ${className}`.trim()} onClick={onOpen}>
     <MessageCircle size={18} />
     AI作品集小助手
   </button>

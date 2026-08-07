@@ -70,7 +70,7 @@ export const projects = [
     title: 'Portfolio AI Agent\n作品集智能导览助手',
     meta: 'PERSONAL PROJECT · 2026',
     description: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',
-    tags: ['AI Agent', '作品集导览', '知识库设计', '对话体验', 'AI Coding'],
+    tags: ['AI Agent', '知识库设计', '对话体验', 'AI Coding'],
     image: assetUrl('project-08/cover.webp'),
     detailTitle: 'Portfolio AI Agent\n作品集智能导览助手',
     detailSubtitle: '当个人网站内容不断增加，我尝试用 AI Agent 降低浏览者理解作品集的成本',

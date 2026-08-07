@@ -52,7 +52,7 @@ export default function BorderGlow({ children, className = '', ...props }) {
     card.style.setProperty('--cursor-angle', `${angle.toFixed(3)}deg`)
   }, [])
 
-  const colors = ['#ff3526', '#ff766b', '#8f170f']
+  const colors = ['#5500C3', '#8c5cff', '#2a0066']
 
   return <div
     {...props}
@@ -66,7 +66,7 @@ export default function BorderGlow({ children, className = '', ...props }) {
       '--glow-padding': '28px',
       '--cone-spread': 22,
       '--fill-opacity': 0.26,
-      ...buildGlowVars('5 100 57', 0.9),
+      ...buildGlowVars('266 100 38', 0.9),
       ...buildGradientVars(colors),
     }}
   >

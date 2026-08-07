@@ -274,8 +274,8 @@ function HomePage() {
     <section className="experience-section section" id="experience" data-motion-section>
       <div className="shell">
       <div className="experience-intro">
-        <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>10年设计实践，<br/>聚焦UX产品体验设计。</h2></div>
-        <p>曾负责 Soul App 核心业务体验设计，覆盖内容创作、广告商业化、增长、3D资产平台与 AI 记忆 / 用户画像探索。<br/><br/>我的优势是从复杂业务问题出发，梳理产品机制与系统链路，并将 AI 能力转化为清晰、自然、可信任的用户体验。</p>
+        <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>Hi 我是左胤<br/>资深UX产品体验设计师</h2></div>
+        <p>花名沙丁鱼，10年UI/UX产品体验设计经验，前SoulAPP资深UX体验设计师。<br/><br/>具备C端社区内容、B端复杂工具、AI产品及多终端设计经验，擅长从用户问题与业务目标出发，完成需求洞察、体验判断、复杂流程与边界设计，并推动方案从原型验证到研发落地。<br/><br/>兼具结构化交互与视觉表达能力，熟悉数据反馈、设计规范及跨团队协作，可结合AI Coding 快速搭建高保真交互Demo，提升方案验证与交付效率。</p>
       </div>
       <div className="stats">
           <div data-stagger-item><strong>10<sup>+</sup></strong><span>年设计经验</span></div><div data-stagger-item><strong>4<sup>+</sup></strong><span>业务领域</span></div><div data-stagger-item><strong>30<sup>+</sup></strong><span>核心项目</span></div><div data-stagger-item><strong>0→1<sup className="stat-spacer" aria-hidden="true">+</sup></strong><span>复杂产品搭建</span></div>

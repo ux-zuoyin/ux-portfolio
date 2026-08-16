@@ -16,6 +16,13 @@ const openingMessage = {
   ].join('\n'),
 }
 
+const initialWelcomeSuggestions = [
+  '我只有 3 分钟，应该怎么看这份作品集？',
+  '哪些项目最能体现他的 AI 产品设计能力？',
+  '他的 B 端复杂系统能力体现在哪里？',
+  '如果面试 AI UX 岗位，应该优先看哪些项目？',
+]
+
 const agentResponseGuidelines = [
   '所有回答使用 Markdown。',
   '回答以二级标题开头，不输出代码块或 JSON。',
@@ -57,14 +64,43 @@ function splitKeywordText(value) {
     .filter(Boolean)
 }
 
-function isUsefulProjectKeyword(value) {
-  const keyword = normalizeQuestion(value)
-  return keyword.length > 2 && !['ai', 'ux', '3d', 'b端'].includes(keyword)
+const projectAliasesByIndex = {
+  '01': ['灵魂记忆', 'AI 动态画像', '动态画像'],
+  '02': ['AIGC 发布器', 'AI 辅助发帖', 'AI 适时介入创作'],
+  '03': ['Soul 广告生态设计', 'Soul 广告生态', '广告生态设计', '广告商业化项目'],
+  '04': ['多任务福利积分页', '福利积分页', '多任务福利积分'],
+  '05': ['NAWA', 'NAWA 特效编辑器', 'NAWA 编辑器', 'EffectCreator', '3D 资产配置全链路'],
+  '06': ['用户声音统一运营中枢', '用户声音后台', '用户声音', '用户反馈平台'],
+  '07': ['0 代码活动快速搭建', '0 代码活动搭建', '零代码活动快速搭建', '零代码活动搭建', '活动搭投平台', '活动搭建平台'],
+  '08': ['Portfolio AI Agent', 'AI Portfolio Agent', '作品集智能导览助手', '作品集助手'],
+  '09': ['复杂事件编排', '事件编排理解成本', '事件配置成本'],
 }
+
+const projectJumpTitles = {
+  '01': '灵魂记忆 AI 动态画像',
+  '02': 'AI 适时介入创作 / AIGC 发布器',
+  '03': 'Soul 广告生态设计',
+  '04': '多任务福利积分页',
+  '05': 'NAWA 特效编辑器',
+  '06': '用户声音统一运营中枢',
+  '07': '0 代码活动快速搭建',
+  '08': 'Portfolio AI Agent',
+}
+
+function normalizeProjectIndex(value) {
+  return String(value || '').padStart(2, '0')
+}
+
+const assistantDeepDives = portfolioKnowledge.projects.flatMap((project) =>
+  (project.deepDives || []).map((deepDive) => ({
+    ...deepDive,
+    projectIndex: normalizeProjectIndex(deepDive.projectIndex || project.index),
+  })),
+)
 
 function convertProjectToAssistantKnowledge(project) {
   const subtitle = project.subtitle || project.detailSubtitle || project.description || ''
-  const title = project.detailTitle || project.title
+  const title = project.title || project.detailTitle
   const keywords = [
     project.index,
     `项目${project.index}`,
@@ -76,28 +112,72 @@ function convertProjectToAssistantKnowledge(project) {
   ].flatMap(splitKeywordText)
 
   return {
+    ...project,
+    index: normalizeProjectIndex(project.index),
     title: String(title || '').replace(/\n/g, ' '),
+    subtitle,
     category: project.category,
+    tags: project.tags || [],
+    assistantBrief: project.assistantBrief,
     keywords: [...new Set(keywords)],
     summary: project.assistantBrief,
-    value: project.assistantBrief,
   }
 }
 
 const projectKnowledgeFromData = portfolioProjects
-  .filter((project) => project.assistantBrief)
   .map(convertProjectToAssistantKnowledge)
 
-const assistantProjectKnowledge = [
-  ...portfolioKnowledge.projects,
-  ...projectKnowledgeFromData,
-].reduce((result, project) => {
-  const titleKey = normalizeText(project.title)
-  if (!result.some((item) => normalizeText(item.title) === titleKey)) {
-    result.push(project)
+const supplementalProjectKnowledgeByIndex = new Map(
+  portfolioKnowledge.projects.map((project) => [normalizeProjectIndex(project.index), project]),
+)
+
+const assistantProjectKnowledge = projectKnowledgeFromData.map((project) => {
+  const supplemental = supplementalProjectKnowledgeByIndex.get(project.index) || {}
+  return {
+    ...supplemental,
+    ...project,
+    summary: supplemental.summary || project.summary || project.assistantBrief || project.subtitle,
+    value: supplemental.value || project.assistantBrief,
+    keywords: [...new Set([
+      ...(supplemental.keywords || []),
+      ...(project.keywords || []),
+      ...(projectAliasesByIndex[project.index] || []),
+    ])],
   }
-  return result
-}, [])
+}).sort((a, b) => Number(a.index) - Number(b.index))
+
+function getRelatedProjectsFromAnswer(answerText) {
+  const normalizedAnswer = normalizeQuestion(answerText)
+
+  return portfolioProjects
+    .map((project) => {
+      const index = normalizeProjectIndex(project.index)
+      const candidates = [
+        `项目${Number(index)}`,
+        `项目${index}`,
+        project.title,
+        project.detailTitle,
+        ...(projectAliasesByIndex[index] || []),
+      ]
+        .filter(Boolean)
+        .map(normalizeQuestion)
+
+      const positions = candidates
+        .map((candidate) => normalizedAnswer.indexOf(candidate))
+        .filter((position) => position >= 0)
+
+      if (positions.length === 0) return null
+      return { ...project, index, answerPosition: Math.min(...positions) }
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.answerPosition - b.answerPosition)
+    .map(({ answerPosition, ...project }) => project)
+}
+
+function getProjectJumpTitle(project) {
+  return projectJumpTitles[normalizeProjectIndex(project.index)]
+    || String(project.title || project.detailTitle || '').replace(/\n/g, ' ')
+}
 
 function findRelevantProjects(question) {
   const normalizedQuestion = normalizeText(question)
@@ -120,34 +200,8 @@ function findRelevantProjects(question) {
   })
 }
 
-function stripProjectIntentWords(value) {
-  return normalizeQuestion(value)
-    .replace(/介绍一下|介绍下|介绍|是什么|项目|第|个/g, '')
-}
-
-function getProjectSearchCorpus(project) {
-  const corpus = [
-    project.index,
-    project.title,
-    project.detailTitle,
-    project.subtitle,
-    project.detailSubtitle,
-    project.description,
-    project.category,
-    project.assistantBrief,
-    ...(project.tags || []),
-  ].filter(Boolean)
-
-  if (corpus.some((item) => normalizeQuestion(item).includes('作品集') && normalizeQuestion(item).includes('助手'))) {
-    corpus.push('作品集助手')
-  }
-
-  return corpus
-}
-
-function getProjectByQuestion(question) {
+function getProjectIndexByQuestion(question, recentProjectIndex = null) {
   const normalizedQuestion = normalizeQuestion(question)
-  const searchableQuestion = stripProjectIntentWords(question)
 
   for (const project of portfolioProjects) {
     const paddedIndex = project.index
@@ -168,96 +222,284 @@ function getProjectByQuestion(question) {
       || normalizedQuestion === paddedIndex
       || indexPatterns.some((pattern) => normalizedQuestion.includes(pattern))
     ) {
-      return project
+      return normalizeProjectIndex(project.index)
     }
   }
 
-  for (const project of portfolioProjects) {
-    const titleFields = [project.title, project.detailTitle].filter(Boolean)
-    const titleCorpus = titleFields
-      .flatMap(splitKeywordText)
-      .filter(isUsefulProjectKeyword)
-
-    if (
-      (searchableQuestion.length > 1 && titleFields.some((field) => normalizeQuestion(field).includes(searchableQuestion)))
-      || titleCorpus.some((keyword) => normalizedQuestion.includes(normalizeQuestion(keyword)))
-    ) {
-      return project
-    }
+  const refersToRecentProject = normalizedQuestion.includes('这个项目') || normalizedQuestion.includes('该项目')
+  if (refersToRecentProject && recentProjectIndex) {
+    return normalizeProjectIndex(recentProjectIndex)
   }
 
   for (const project of portfolioProjects) {
-    const tagCorpus = project.tags || []
-
-    if (tagCorpus.some((tag) => normalizedQuestion.includes(normalizeQuestion(tag)))) {
-      return project
-    }
-  }
-
-  for (const project of portfolioProjects) {
-    const projectCorpus = getProjectSearchCorpus(project)
-    const briefCorpus = projectCorpus
-      .flatMap(splitKeywordText)
-      .filter(isUsefulProjectKeyword)
-
-    if (
-      projectCorpus.some((field) => {
-        const normalizedField = normalizeQuestion(field)
-        return searchableQuestion.length > 1 && normalizedField.includes(searchableQuestion)
-      })
-      || briefCorpus.some((keyword) => {
-        const normalizedKeyword = normalizeQuestion(keyword)
-        return normalizedQuestion.includes(normalizedKeyword)
-          || (searchableQuestion.length > 1 && normalizedKeyword.includes(searchableQuestion))
-      })
-    ) {
-      return project
+    const aliases = [
+      ...(projectAliasesByIndex[normalizeProjectIndex(project.index)] || []),
+      project.title,
+      project.detailTitle,
+    ].filter(Boolean)
+    if (aliases.some((alias) => normalizedQuestion.includes(normalizeQuestion(alias)))) {
+      return normalizeProjectIndex(project.index)
     }
   }
 
   return null
 }
 
+function getProjectKnowledgeByIndex(index) {
+  const normalizedIndex = normalizeProjectIndex(index)
+  return assistantProjectKnowledge.find((project) => project.index === normalizedIndex) || null
+}
+
+function getProjectByQuestion(question, recentProjectIndex = null) {
+  const projectIndex = getProjectIndexByQuestion(question, recentProjectIndex)
+  return projectIndex ? getProjectKnowledgeByIndex(projectIndex) : null
+}
+
+function getProjectDeepDiveByQuestion(question, recentProjectIndex = null, explicitProjectIndex = null) {
+  const normalizedQuestion = normalizeQuestion(question)
+  const matchedProject = explicitProjectIndex
+    ? getProjectKnowledgeByIndex(explicitProjectIndex)
+    : getProjectByQuestion(question, recentProjectIndex)
+  if (!matchedProject) return null
+
+  return assistantDeepDives
+    .filter((deepDive) => deepDive.projectIndex === normalizeProjectIndex(matchedProject.index))
+    .map((deepDive) => ({
+      ...deepDive,
+      matchScore: deepDive.keywords.reduce((score, keyword) => (
+        normalizedQuestion.includes(normalizeQuestion(keyword)) ? score + 1 : score
+      ), 0),
+    }))
+    .filter((deepDive) => deepDive.matchScore > 0)
+    .sort((a, b) => b.matchScore - a.matchScore)[0] || null
+}
+
 function getProjectSubtitle(project) {
   return project.subtitle || project.detailSubtitle || project.description || ''
 }
 
+const projectSpecificCapabilities = {
+  '01': [
+    'AI UX 可信与可控设计',
+    '用户画像与标签管理',
+    '复杂状态与边界设计',
+    '用户确认与纠错机制',
+  ],
+  '02': ['AIGC 介入时机设计', '内容生产流程设计', '用户控制与确认', 'AI UX 反馈设计'],
+  '03': ['商业化体验平衡', '场景化广告适配', '信息层级与转化路径', '复杂规则与跨团队协作'],
+  '04': ['多任务决策设计', '状态驱动参与路径', '信息优先级与组件规则', '增长数据复盘'],
+  '05': ['复杂对象与任务建模', '事件编排与配置降本', '预览验证闭环', '专业生产工具 UX'],
+  '06': ['多来源反馈归一', '多角色状态流转', '任务处理闭环', '数据沉淀与运营效率'],
+  '07': ['低代码搭建流程', '组件化与规则约束', '预览发布闭环', '运营配置效率'],
+  '08': ['Agent 交互与任务导览', '本地知识库组织', '回答边界与证据关联', 'AI Coding 原型验证'],
+}
+
+function getUniqueProjectCapabilities(project) {
+  const preferredCapabilities = projectSpecificCapabilities[normalizeProjectIndex(project.index)]
+  const capabilities = preferredCapabilities || [...(project.tags || []), project.category]
+  const seen = new Set()
+
+  return capabilities.filter((capability) => {
+    if (!capability) return false
+    const key = normalizeText(capability)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  }).slice(0, 5)
+}
+
+function getProjectResponsibility(project) {
+  const structuredResponsibility = project.role || project.responsibility || project.responsibilities
+  if (Array.isArray(structuredResponsibility)) return structuredResponsibility.join('、')
+  if (structuredResponsibility) return structuredResponsibility
+
+  const responsibilityFromBrief = String(project.assistantBrief || '').match(/左胤负责[^。]+。?/)
+  if (responsibilityFromBrief) return responsibilityFromBrief[0]
+
+  return '当前结构化资料没有单独记录左胤在该项目中的具体职责，建议在面试中继续确认，不能根据详情图片自行推断。'
+}
+
 function generateSingleProjectAnswer(project) {
   const subtitle = getProjectSubtitle(project)
-  const tags = project.tags || []
-  const brief = project.assistantBrief || [
-    project.detailTitle || project.title,
-    subtitle,
-    tags.length > 0 ? `关键词包括：${tags.join('、')}。` : '',
-  ].filter(Boolean).join(' ')
+  const capabilities = getUniqueProjectCapabilities(project)
+  const summary = project.summary || subtitle || project.assistantBrief || '当前项目资料正在补充。'
+  const coreProblem = project.conflict || project.background || subtitle || '当前结构化资料没有单独记录核心问题。'
+  const responsibility = getProjectResponsibility(project)
 
   return [
-    '## 项目总结',
+    '## 项目概览',
     '',
-    brief,
+    summary,
     '',
     '---',
     '',
-    '## 这个项目解决的问题',
+    '## 核心问题',
     '',
-    `${project.detailTitle || project.title} 主要围绕「${subtitle || '当前项目场景'}」展开，结合 ${tags.length > 0 ? tags.join('、') : '项目目标和用户体验'}，重点解决相关场景中的理解成本、操作成本或协作效率问题。`,
+    coreProblem,
     '',
     '---',
     '',
     '## 左胤负责的内容',
     '',
-    project.assistantBrief
-      ? `从项目资料看，左胤主要负责其中的体验设计、交互链路、信息组织和方案表达工作。${project.assistantBrief}`
-      : '从现有项目资料看，左胤主要负责项目体验设计、信息结构梳理、关键流程设计和方案表达。',
+    responsibility,
+    '',
+    '---',
+    '',
+    '## 设计判断',
+    '',
+    project.designJudgment || project.solution || '当前结构化资料没有记录足够具体的设计判断，不能根据图片自行补全。',
     '',
     '---',
     '',
     '## 能力体现',
     '',
-    [
-      ...tags.slice(0, 4),
-      project.category,
-    ].filter(Boolean).slice(0, 5).map((item) => `- ${item}`).join('\n'),
+    capabilities.map((item) => `- ${item}`).join('\n'),
+  ].join('\n')
+}
+
+function isProjectDataQuestion(question) {
+  const normalizedQuestion = normalizeText(question)
+  return includesAny(normalizedQuestion, [
+    '哪些数据', '真实数据', '真实上线数据', '上线结果', '测试数据', '验证数据',
+    '数据真实吗', '数据边界', '模拟数据', '提升了多少', '增长了多少', '因果归因',
+  ])
+}
+
+function isProjectResponsibilityQuestion(question) {
+  return includesAny(normalizeText(question), ['负责什么', '具体负责', '职责', '参与了什么', '承担什么'])
+}
+
+function isProjectBoundaryQuestion(question) {
+  return includesAny(normalizeText(question), ['能力边界', '哪些边界', '项目边界', '不能证明', '是否夸大', '过度包装'])
+}
+
+function isSingleProjectIntroQuestion(question) {
+  return includesAny(normalizeText(question), [
+    '介绍', '项目概览', '简单说说', '简单讲讲', '项目是什么', '是什么项目',
+    '项目背景', '背景是什么',
+  ])
+}
+
+function isProjectTopicQuestion(question) {
+  return includesAny(normalizeText(question), [
+    '如何', '为什么', '怎么判断', '怎么设计', '什么机制', '平衡', '降低',
+    '设计判断', '设计取舍', '用户控制', '最终控制', '触发', '优先级',
+    '如何体现', '证明什么能力', '验证', '闭环', '配置成本',
+  ])
+}
+
+function isBareProjectReference(question, project) {
+  const normalizedQuestion = normalizeQuestion(question)
+  const candidates = [
+    project.index,
+    String(Number(project.index)),
+    project.title,
+    project.detailTitle,
+    ...(projectAliasesByIndex[project.index] || []),
+  ].filter(Boolean).map(normalizeQuestion)
+  return candidates.includes(normalizedQuestion)
+}
+
+const projectValidationTypes = {
+  '01': '内部小样本测试与方案模拟',
+  '04': '真实上线后的同期对比数据',
+  '05': '内部小样本任务测试',
+}
+
+function formatProjectDataBoundaryAnswer(project) {
+  const validationType = projectValidationTypes[project.index]
+  if (!project.validation) {
+    return [
+      '## 数据结论',
+      '',
+      `当前结构化资料中没有记录${getProjectJumpTitle(project)}的项目级验证数据或真实上线指标，因此不能编造提升比例、转化结果或因果结论。`,
+      '',
+      '---',
+      '',
+      '## 当前可确认的边界',
+      '',
+      project.boundary || '现有资料只能说明项目背景、设计判断和方案方向，数据结果需要在面试中继续向左胤确认。',
+    ].join('\n')
+  }
+
+  return [
+    '## 数据结论',
+    '',
+    `${getProjectJumpTitle(project)}当前有${validationType}，需要按证据类型准确表达，不能把内部测试或同期对比直接包装成严格因果结果。`,
+    '',
+    '---',
+    '',
+    '## 已有证据',
+    '',
+    project.validation,
+    '',
+    '---',
+    '',
+    '## 表达边界',
+    '',
+    project.boundary || '当前资料未补充更进一步的数据边界，不能扩展解释。',
+  ].join('\n')
+}
+
+function formatProjectResponsibilityAnswer(project) {
+  return [
+    '## 左胤负责的内容',
+    '',
+    getProjectResponsibility(project),
+    '',
+    '---',
+    '',
+    '## 对应设计工作',
+    '',
+    project.solution || project.designJudgment || '当前资料没有进一步拆分具体设计工作，不能根据图片自行推断。',
+  ].join('\n')
+}
+
+function formatProjectBoundaryAnswer(project) {
+  return [
+    '## 项目边界',
+    '',
+    project.boundary || `当前资料没有单独记录${getProjectJumpTitle(project)}的项目边界，不能补充未经确认的工程能力、数据结果或个人归因。`,
+    '',
+    '---',
+    '',
+    '## 可以确认的能力',
+    '',
+    getUniqueProjectCapabilities(project).map((capability) => `- ${capability}`).join('\n'),
+  ].join('\n')
+}
+
+function formatProjectTopicAnswer(project) {
+  if (!project.designJudgment && !project.solution) {
+    return [
+      '## 当前资料边界',
+      '',
+      `${getProjectJumpTitle(project)}目前只有标题、简介和详情媒体路径，缺少可检索的设计判断与机制说明。详情图内容尚未结构化，Agent 不能根据图片自行推断。`,
+      '',
+      '---',
+      '',
+      '## 建议补充',
+      '',
+      '需要补充项目范围、核心冲突、设计判断、关键机制、验证方式，以及它与其他项目的关系。',
+    ].join('\n')
+  }
+
+  return [
+    '## 核心判断',
+    '',
+    project.designJudgment || project.conflict,
+    '',
+    '---',
+    '',
+    '## 具体机制',
+    '',
+    project.solution || '当前资料只记录了设计判断，没有结构化到更细的交互机制，不能根据详情图自行补全。',
+    '',
+    '---',
+    '',
+    '## 项目价值',
+    '',
+    project.value || project.assistantBrief || '当前资料没有进一步记录项目价值。',
   ].join('\n')
 }
 
@@ -305,59 +547,313 @@ function formatRelatedEvidenceSection(projects) {
   ]
 }
 
-function getFollowUpSuggestions(question) {
+function normalizeFollowUpText(value) {
+  return String(value || '')
+    .normalize('NFKC')
+    .toLowerCase()
+    .trim()
+    .replace(/^(?:(?:请问|我想了解(?:一下|下)?|想了解(?:一下|下)?|请(?:帮我)?介绍(?:一下|下)?|介绍(?:一下|下)?|讲讲|说说)\s*)+/, '')
+    .replace(/[\p{P}\p{S}]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function getFollowUpBigrams(value) {
+  const text = normalizeFollowUpText(value).replace(/\s+/g, '')
+  if (text.length < 2) return new Set(text ? [text] : [])
+
+  const bigrams = new Set()
+  for (let index = 0; index < text.length - 1; index += 1) {
+    bigrams.add(text.slice(index, index + 2))
+  }
+  return bigrams
+}
+
+function areFollowUpTextsSimilar(first, second) {
+  const firstText = normalizeFollowUpText(first).replace(/\s+/g, '')
+  const secondText = normalizeFollowUpText(second).replace(/\s+/g, '')
+  if (!firstText || !secondText) return false
+  if (firstText === secondText) return true
+
+  const shorterLength = Math.min(firstText.length, secondText.length)
+  const longerLength = Math.max(firstText.length, secondText.length)
+  if (
+    shorterLength >= 6
+    && (firstText.includes(secondText) || secondText.includes(firstText))
+    && shorterLength / longerLength >= 0.72
+  ) {
+    return true
+  }
+
+  const firstBigrams = getFollowUpBigrams(firstText)
+  const secondBigrams = getFollowUpBigrams(secondText)
+  if (firstBigrams.size === 0 || secondBigrams.size === 0) return false
+
+  let overlap = 0
+  firstBigrams.forEach((bigram) => {
+    if (secondBigrams.has(bigram)) overlap += 1
+  })
+  return (2 * overlap) / (firstBigrams.size + secondBigrams.size) >= 0.78
+}
+
+const unsupportedFollowUpQueries = new Set([
+  '这些项目解决的问题和体现的能力有什么差异',
+  '最关键的设计判断和方案取舍是什么',
+  '哪个项目最适合在面试中重点展开',
+  '哪些项目最适合在面试中重点展开',
+  '这些项目之间有什么不同',
+])
+
+function getDeepDiveById(projectIndex, deepDiveId) {
+  const normalizedIndex = normalizeProjectIndex(projectIndex)
+  return assistantDeepDives.find((deepDive) => (
+    deepDive.projectIndex === normalizedIndex && deepDive.id === deepDiveId
+  )) || null
+}
+
+function createProjectFollowUp(projectIndex, label = null) {
+  const project = getProjectKnowledgeByIndex(projectIndex)
+  if (!project) return null
+
+  return {
+    label: label || `介绍项目 ${project.index}`,
+    query: `介绍下项目 ${project.index}`,
+    type: 'single-project',
+    routeKey: 'single-project',
+    projectIndex: project.index,
+    deepDiveId: '',
+  }
+}
+
+function createDeepDiveFollowUp(deepDive) {
+  if (!deepDive) return null
+  return {
+    label: deepDive.title,
+    query: deepDive.title.endsWith('？') ? deepDive.title : `${deepDive.title}？`,
+    type: 'deep-dive',
+    routeKey: 'deep-dive',
+    projectIndex: deepDive.projectIndex,
+    deepDiveId: deepDive.id,
+  }
+}
+
+const overviewFollowUpPool = [
+  {
+    label: '看 AI 项目',
+    query: '哪些项目最能体现他的 AI 产品设计能力？',
+    type: 'project-collection',
+    routeKey: 'ai-project-collection',
+    projectIndex: '',
+    deepDiveId: '',
+  },
+  {
+    label: '看 B 端项目',
+    query: '他的 B 端复杂系统能力体现在哪里？',
+    type: 'project-collection',
+    routeKey: 'b-end-project-collection',
+    projectIndex: '',
+    deepDiveId: '',
+  },
+  {
+    label: '看 AI 岗位路径',
+    query: '如果面试 AI UX 岗位，应该优先看哪些项目？',
+    type: 'global-guide',
+    routeKey: 'ai-ux-role-guide',
+    projectIndex: '',
+    deepDiveId: '',
+  },
+]
+
+const aiCollectionFollowUpPool = [
+  createDeepDiveFollowUp(getDeepDiveById('01', 'avoid-over-defining-user')),
+  createDeepDiveFollowUp(getDeepDiveById('02', 'ai-intervention-timing')),
+  createDeepDiveFollowUp(getDeepDiveById('08', 'local-knowledge-organization')),
+].filter(Boolean)
+
+const bEndCollectionFollowUpPool = [
+  createProjectFollowUp('05'),
+  createProjectFollowUp('06'),
+  createProjectFollowUp('07'),
+].filter(Boolean)
+
+const commercialCollectionFollowUpPool = [
+  createProjectFollowUp('03'),
+  createProjectFollowUp('04'),
+].filter(Boolean)
+
+const followUpRouteValidators = {
+  'global-guide': (followUp) => ['three-minute-guide', 'ai-ux-role-guide'].includes(followUp.routeKey),
+  'project-collection': (followUp) => [
+    'ai-project-collection',
+    'b-end-project-collection',
+    'commercial-project-collection',
+  ].includes(followUp.routeKey),
+  'single-project': (followUp) => followUp.routeKey === 'single-project' && Boolean(followUp.projectIndex),
+  'deep-dive': (followUp) => followUp.routeKey === 'deep-dive'
+    && Boolean(followUp.projectIndex)
+    && Boolean(followUp.deepDiveId),
+  'data-boundary': (followUp) => followUp.routeKey === 'project-data-boundary'
+    && Boolean(followUp.projectIndex),
+  contact: (followUp) => followUp.routeKey === 'contact',
+  'role-fit': (followUp) => followUp.routeKey === 'role-fit',
+}
+
+function canAnswerFollowUp(followUp, {
+  currentQuestion = '',
+  askedQuestions = [],
+  currentDeepDiveId = '',
+} = {}) {
+  if (!followUp?.query || !followUp?.type || !followUp?.routeKey) return false
+
+  const validateRoute = followUpRouteValidators[followUp.type]
+  if (!validateRoute || !validateRoute(followUp)) return false
+
+  if (followUp.projectIndex && !getProjectKnowledgeByIndex(followUp.projectIndex)) return false
+
+  if (followUp.deepDiveId) {
+    const deepDive = getDeepDiveById(followUp.projectIndex, followUp.deepDiveId)
+    if (!deepDive || deepDive.id === currentDeepDiveId) return false
+  }
+
+  const normalizedQuery = normalizeFollowUpText(followUp.query).replace(/\s+/g, '')
+  if (unsupportedFollowUpQueries.has(normalizedQuery)) return false
+
+  return ![currentQuestion, ...askedQuestions].some((question) => (
+    areFollowUpTextsSimilar(followUp.query, question)
+  ))
+}
+
+function getAnswerRouteKey(question, {
+  matchedProject = null,
+  matchedDeepDive = null,
+} = {}) {
   const normalizedQuestion = normalizeText(question)
-  const isBEndTopic = includesAny(normalizedQuestion, ['B 端', 'B端', '后台', '复杂系统', '复杂后台', '用户反馈', '运营中枢', '活动搭建', '活动搭投', '项目深度'])
-  const isAITopic = includesAny(normalizedQuestion, ['AI', 'AIGC', 'Agent', '智能体', 'Codex', '标签', '灵魂记忆', 'Memory', 'Persona', 'Social Match', 'AI UX', 'AI产品', 'AI 产品'])
-  const isRoleTopic = includesAny(normalizedQuestion, ['岗位', '职位', '匹配', '适合', '胜任'])
-  const isCommercialTopic = includesAny(normalizedQuestion, ['商业化', '广告', '增长', '转化'])
-  const isContentToolTopic = includesAny(normalizedQuestion, ['内容工具', '内容生产', '创作者工具', '发布器', 'NAWA', '编辑器'])
 
-  if (isBEndTopic) {
-    return [
-      { label: '看具体 B 端项目', question: '请介绍一个最能体现 B 端复杂系统能力的项目。' },
-      { label: '他在项目里负责什么？', question: '左胤在这些 B 端项目里具体负责什么？' },
-      { label: '这个能力适合什么岗位？', question: '他的 B 端和复杂系统能力适合什么岗位？' },
-    ]
+  if (matchedDeepDive) return 'deep-dive'
+  if (isThreeMinuteReadingQuestion(normalizedQuestion)) return 'three-minute-guide'
+  if (isAIUXRoleReadingQuestion(normalizedQuestion)) return 'ai-ux-role-guide'
+  if (isAIProjectCollectionQuestion(normalizedQuestion)) return 'ai-project-collection'
+  if (isBEndProjectCollectionQuestion(normalizedQuestion)) return 'b-end-project-collection'
+  if (isCommercialProjectCollectionQuestion(normalizedQuestion)) return 'commercial-project-collection'
+  if (matchedProject && isProjectDataQuestion(question)) return 'project-data-boundary'
+  if (matchedProject) return 'single-project'
+  return 'global-overview'
+}
+
+function getProjectDeepDiveFollowUps(projectIndex, currentDeepDiveId = '') {
+  return assistantDeepDives
+    .filter((deepDive) => (
+      deepDive.projectIndex === normalizeProjectIndex(projectIndex)
+      && deepDive.id !== currentDeepDiveId
+    ))
+    .map(createDeepDiveFollowUp)
+}
+
+function getFollowUpSuggestions(question, {
+  askedQuestions = [],
+  matchedProject = null,
+  matchedDeepDive = null,
+  answerRouteKey = 'global-overview',
+} = {}) {
+  let candidates = []
+
+  if (answerRouteKey === 'ai-project-collection' || answerRouteKey === 'ai-ux-role-guide') {
+    candidates = aiCollectionFollowUpPool
+  } else if (answerRouteKey === 'b-end-project-collection') {
+    candidates = bEndCollectionFollowUpPool
+  } else if (answerRouteKey === 'commercial-project-collection') {
+    candidates = commercialCollectionFollowUpPool
+  } else if (matchedDeepDive) {
+    candidates = getProjectDeepDiveFollowUps(matchedDeepDive.projectIndex, matchedDeepDive.id)
+  } else if (matchedProject) {
+    candidates = getProjectDeepDiveFollowUps(matchedProject.index)
+  } else {
+    candidates = overviewFollowUpPool
   }
 
-  if (isAITopic) {
-    return [
-      { label: '看灵魂记忆', question: '灵魂记忆如何避免 AI 过度定义用户？' },
-      { label: '看 AIGC 发布器', question: 'AIGC 发布器的设计判断是什么？' },
-      { label: '看 AI Agent', question: '这个作品集智能导览助手能证明什么能力？' },
-    ]
+  const accepted = []
+  candidates.forEach((candidate) => {
+    if (!canAnswerFollowUp(candidate, {
+      currentQuestion: question,
+      askedQuestions,
+      currentDeepDiveId: matchedDeepDive?.id || '',
+    })) return
+
+    const isDuplicateCandidate = accepted.some((item) => (
+      areFollowUpTextsSimilar(item.query, candidate.query)
+    ))
+    if (!isDuplicateCandidate) accepted.push(candidate)
+  })
+
+  return accepted.slice(0, 3)
+}
+
+function runFollowUpRegressionChecks() {
+  const failures = []
+  const expect = (condition, message) => {
+    if (!condition) failures.push(message)
   }
 
-  if (isRoleTopic) {
-    return [
-      { label: '看 AI 能力证据', question: '左胤的 AI 产品设计能力体现在哪里？有哪些项目可以证明？' },
-      { label: '看 B 端深度', question: '我想了解下他 B 端设计经验以及项目深度如何。' },
-      { label: '推荐阅读路径', question: '我应该按什么顺序看这个作品集？' },
-    ]
+  const unsupportedComparison = {
+    label: '比较项目差异',
+    query: '这些项目解决的问题和体现的能力有什么差异？',
+    type: 'project-collection',
+    routeKey: 'ai-project-collection',
+    projectIndex: '',
+    deepDiveId: '',
   }
+  expect(!canAnswerFollowUp(unsupportedComparison), '泛化项目差异问题不应通过校验')
 
-  if (isCommercialTopic) {
-    return [
-      { label: '看福利积分项目', question: '福利积分项目如何平衡体验、参与效率和商业目标？' },
-      { label: '看设计取舍', question: '左胤在商业化项目中有哪些关键设计判断和方案取舍？' },
-      { label: '看岗位匹配', question: '商业化设计经验能支撑他匹配什么类型岗位？' },
-    ]
+  const overviewSuggestions = getFollowUpSuggestions('请用 3 分钟介绍作品集', {
+    answerRouteKey: 'three-minute-guide',
+  })
+  expect(
+    overviewSuggestions.every((item) => ['global-guide', 'project-collection'].includes(item.type)),
+    '作品集概览后只能展示全局稳定问题',
+  )
+
+  const aiSuggestions = getFollowUpSuggestions('哪些项目最能体现他的 AI 产品设计能力？', {
+    answerRouteKey: 'ai-project-collection',
+  })
+  expect(
+    aiSuggestions.every((item) => item.type === 'deep-dive' && Boolean(getDeepDiveById(item.projectIndex, item.deepDiveId))),
+    'AI 项目集合后只能展示存在的 deepDive',
+  )
+
+  const project01DeepDive = getDeepDiveById('01', 'avoid-over-defining-user')
+  const project01Suggestions = getFollowUpSuggestions('灵魂记忆如何避免 AI 过度定义用户？', {
+    matchedProject: getProjectKnowledgeByIndex('01'),
+    matchedDeepDive: project01DeepDive,
+    answerRouteKey: 'deep-dive',
+  })
+  expect(
+    project01Suggestions.every((item) => item.projectIndex === '01' && item.deepDiveId !== project01DeepDive.id),
+    '项目 01 deepDive 后应保留同项目上下文且不重复当前专题',
+  )
+
+  const project07Suggestions = getFollowUpSuggestions('介绍下项目 07', {
+    matchedProject: getProjectKnowledgeByIndex('07'),
+    answerRouteKey: 'single-project',
+  })
+  expect(
+    project07Suggestions.every((item) => item.projectIndex === '07' && item.routeKey === 'deep-dive'),
+    '项目 07 后不应出现会误判为 B 端集合的追问',
+  )
+
+  expect(
+    [overviewSuggestions, aiSuggestions, project01Suggestions, project07Suggestions]
+      .every((items) => items.length <= 3),
+    '继续追问最多显示 3 条',
+  )
+
+  return failures
+}
+
+if (import.meta.env.DEV) {
+  const followUpRegressionFailures = runFollowUpRegressionChecks()
+  if (followUpRegressionFailures.length > 0) {
+    throw new Error(`继续追问回归检查失败：${followUpRegressionFailures.join('；')}`)
   }
-
-  if (isContentToolTopic) {
-    return [
-      { label: '看 AIGC 发布器', question: 'AIGC 发布器的设计判断是什么？' },
-      { label: '看 NAWA 编辑器', question: 'NAWA 编辑器能体现哪些内容生产工具设计能力？' },
-      { label: '看完整链路', question: '左胤如何设计生成、编辑、预览和发布的完整工作流？' },
-    ]
-  }
-
-  return [
-    { label: '3 分钟了解', question: '请用面试官视角，用 3 分钟帮我快速了解左胤的背景、核心能力和最值得看的项目。' },
-    { label: '看 AI 能力', question: '左胤的 AI 产品设计能力体现在哪里？有哪些项目可以证明？' },
-    { label: '看 B 端深度', question: '我想了解下他 B 端设计经验以及项目深度如何。' },
-  ]
 }
 
 function formatAgentCapabilityAnswer() {
@@ -442,7 +938,7 @@ function formatRoleFitAnswer(question) {
   const isAIRole = includesAny(normalizedQuestion, ['AI', 'AIGC', 'Agent', '智能'])
   const roleLabel = isBEndRole ? 'B 端 / 复杂系统设计岗位' : isAIRole ? 'AI 产品体验设计岗位' : '偏 AI 产品体验、复杂 B 端和平台型工具的岗位'
   const evidenceProjects = isBEndRole
-    ? ['NAWA 编辑器', '新活动搭投平台', '用户声音统一运营中枢']
+    ? ['NAWA 特效编辑器', '用户声音统一运营中枢', '0 代码活动快速搭建平台']
     : isAIRole
       ? ['灵魂记忆', 'AIGC 发布器', 'Portfolio AI Agent']
       : ['灵魂记忆', 'NAWA 编辑器', '多任务福利积分页', 'AIGC 发布器']
@@ -465,7 +961,7 @@ function formatRoleFitAnswer(question) {
     '## 项目证据',
     '',
     isBEndRole
-      ? '对应证据包括 NAWA 编辑器、新活动搭投平台和用户声音统一运营中枢。这些项目能体现他对后台流程、平台化能力和复杂协作链路的设计经验。'
+      ? '对应证据包括 NAWA 特效编辑器、用户声音统一运营中枢和 0 代码活动快速搭建平台。这些项目能体现他对后台流程、平台化能力和复杂协作链路的设计经验。'
       : '对应证据包括灵魂记忆、AIGC 发布器，以及这个用 Codex 辅助搭建的 AI 作品集助手。这些项目分别覆盖用户理解、AI 创作辅助和 Agent 原型验证。',
     '',
     '---',
@@ -516,7 +1012,7 @@ function formatPositioningAnswer() {
     '## 能力边界',
     '',
     '需要准确说明的是，他的优势是 AI 产品体验设计、复杂系统拆解和原型验证，不应夸大为大模型算法或完整后端架构能力。',
-    ...formatRelatedEvidenceSection(['灵魂记忆', 'AIGC 发布器', 'Portfolio AI Agent', 'NAWA 编辑器 / 新活动搭投 / 用户声音统一运营中枢']),
+    ...formatRelatedEvidenceSection(['灵魂记忆', 'AIGC 发布器', 'Portfolio AI Agent', 'NAWA 特效编辑器 / 用户声音统一运营中枢 / 0 代码活动快速搭建']),
   ].join('\n')
 }
 
@@ -539,6 +1035,130 @@ function formatReadingPathAnswer() {
     '',
     '不要只看页面数量，可以重点看他如何解释项目背景、核心矛盾、设计取舍，以及方案为什么最终这样落地。',
   ].join('\n')
+}
+
+function formatAIProjectCollectionAnswer({ roleFocused = false } = {}) {
+  return [
+    roleFocused ? '## AI UX 岗位优先阅读路径' : '## 推荐优先看的 AI 项目',
+    '',
+    roleFocused
+      ? '如果面试 AI UX 岗位，建议优先阅读项目 01、02、08，分别判断他对 AI 信任、AI 创作辅助和 AI Agent 原型的理解。'
+      : '最能体现左胤 AI 产品设计能力的项目是 01、02、08，它们覆盖三类不同的 AI 产品体验问题。',
+    '',
+    '---',
+    '',
+    '## 1. 项目 01：灵魂记忆 AI 动态画像',
+    '',
+    '体现 AI Memory、用户画像、推断确认、敏感信息边界，以及可信、可控、可纠错的 AI 体验设计。',
+    '',
+    '## 2. 项目 02：AI 适时介入创作 / AIGC 发布器',
+    '',
+    '体现 AIGC 创作辅助、发布器流程、AI 触发时机，以及在降低创作门槛时保留用户最终控制。',
+    '',
+    '## 3. 项目 08：Portfolio AI Agent',
+    '',
+    '体现 AI Agent 交互、作品集知识库组织、回答边界、推荐追问和 AI Coding 原型搭建能力。',
+    '',
+    '---',
+    '',
+    '这些项目分别覆盖 AI 画像理解、AI 创作辅助和 AI Agent 原型三个方向。',
+  ].join('\n')
+}
+
+function formatBEndProjectCollectionAnswer() {
+  return [
+    '## B 端与复杂系统项目',
+    '',
+    '左胤的 B 端与复杂系统能力主要体现在项目 05、06、07。',
+    '',
+    '---',
+    '',
+    '## 1. 项目 05：NAWA 特效编辑器 / 3D 资产配置',
+    '',
+    '围绕复杂资产、对象关系、编辑配置、预览和投放链路进行重构，降低专业生产工具的理解、配置和跨团队协作成本。',
+    '',
+    '## 2. 项目 06：用户声音统一运营中枢',
+    '',
+    '统一多来源反馈、分类检索、状态流转和运营处理链路，让客服、产品和运营在同一工作台完成问题闭环。',
+    '',
+    '## 3. 项目 07：0 代码活动快速搭建',
+    '',
+    '通过低代码组件、规则约束、预览和发布流程，降低活动配置对研发排期的依赖并提升运营效率。',
+    '',
+    '---',
+    '',
+    '这些项目体现的是复杂信息架构、流程编排、配置降本和后台效率设计能力。',
+  ].join('\n')
+}
+
+function formatCommercialProjectCollectionAnswer() {
+  return [
+    '## 商业化与增长项目',
+    '',
+    '商业化与增长设计可以优先看项目 03 和项目 04。',
+    '',
+    '---',
+    '',
+    '## 1. 项目 03：Soul 广告生态设计',
+    '',
+    '体现广告内容在不同社区场景中的适配、信息层级、转化路径和低打扰体验设计。',
+    '',
+    '## 2. 项目 04：多任务福利积分页',
+    '',
+    '体现收益优先的信息组织、任务状态驱动的参与路径，以及真实上线后的增长与商业化效果验证。',
+    '',
+    '---',
+    '',
+    '这两个项目分别覆盖商业内容场景化和增长任务决策设计。',
+  ].join('\n')
+}
+
+function asksForProjectCollection(normalizedQuestion) {
+  return includesAny(normalizedQuestion, [
+    '哪些项目',
+    '项目有哪些',
+    '做过哪些',
+    '相关项目',
+    '项目推荐',
+    '优先看哪些项目',
+    '应该看哪些项目',
+    '能力体现在哪里',
+    '能力体现在哪',
+  ])
+}
+
+function isAIProjectCollectionQuestion(normalizedQuestion) {
+  const isAITopic = includesAny(normalizedQuestion, ['AI', 'AIGC', 'AI UX', 'AIUX', '智能', 'Agent'])
+  return isAITopic && asksForProjectCollection(normalizedQuestion)
+}
+
+function isBEndProjectCollectionQuestion(normalizedQuestion) {
+  const isBEndTopic = includesAny(normalizedQuestion, ['B 端', 'B端', '复杂系统', '复杂后台'])
+  return isBEndTopic && asksForProjectCollection(normalizedQuestion)
+}
+
+function isCommercialProjectCollectionQuestion(normalizedQuestion) {
+  const isCommercialTopic = includesAny(normalizedQuestion, ['商业化', '增长设计', '增长项目', '广告项目'])
+  return isCommercialTopic && asksForProjectCollection(normalizedQuestion)
+}
+
+function isThreeMinuteReadingQuestion(normalizedQuestion) {
+  return includesAny(normalizedQuestion, ['3 分钟', '3分钟', '三分钟'])
+    && includesAny(normalizedQuestion, ['怎么看', '怎么阅读', '应该看', '快速了解'])
+}
+
+function isAIUXRoleReadingQuestion(normalizedQuestion) {
+  return includesAny(normalizedQuestion, ['AI UX', 'AIUX', 'AI 产品设计'])
+    && includesAny(normalizedQuestion, ['岗位', '面试'])
+    && asksForProjectCollection(normalizedQuestion)
+}
+
+function isGlobalGuideOrProjectCollectionQuestion(normalizedQuestion) {
+  return isThreeMinuteReadingQuestion(normalizedQuestion)
+    || isAIUXRoleReadingQuestion(normalizedQuestion)
+    || isAIProjectCollectionQuestion(normalizedQuestion)
+    || isBEndProjectCollectionQuestion(normalizedQuestion)
+    || isCommercialProjectCollectionQuestion(normalizedQuestion)
 }
 
 function formatCapabilityMatrixAnswer() {
@@ -581,8 +1201,8 @@ function formatProjectDepthAnswer() {
     '',
     '## 对应项目',
     '',
-    'NAWA 编辑器、用户声音统一运营中枢、新活动搭投平台和灵魂记忆，都能体现这种复杂度。尤其是任务模型、流程状态、配置效率、数据闭环和设计取舍，是判断项目深度的重点。',
-    ...formatRelatedEvidenceSection(['NAWA 编辑器', '用户声音统一运营中枢', '新活动搭投平台', '灵魂记忆']),
+    'NAWA 特效编辑器、用户声音统一运营中枢和 0 代码活动快速搭建平台，都能体现这种复杂度。尤其是任务模型、流程状态、配置效率、数据闭环和设计取舍，是判断项目深度的重点。',
+    ...formatRelatedEvidenceSection(['NAWA 特效编辑器', '用户声音统一运营中枢', '0 代码活动快速搭建平台']),
   ].join('\n')
 }
 
@@ -936,14 +1556,108 @@ function formatAIKnowledgeAnswer(item) {
   ].join('\n')
 }
 
-function buildAgentReply(question) {
-  void agentResponseGuidelines
-  const specificProject = getProjectByQuestion(question)
-  if (specificProject) {
-    return generateSingleProjectAnswer(specificProject)
+function buildStructuredFollowUpAnswer(question, context = {}) {
+  const project = context.projectIndex
+    ? getProjectKnowledgeByIndex(context.projectIndex)
+    : null
+
+  switch (context.routeKey) {
+    case 'three-minute-guide':
+      return formatReadingPathAnswer()
+    case 'ai-ux-role-guide':
+      return formatAIProjectCollectionAnswer({ roleFocused: true })
+    case 'ai-project-collection':
+      return formatAIProjectCollectionAnswer()
+    case 'b-end-project-collection':
+      return formatBEndProjectCollectionAnswer()
+    case 'commercial-project-collection':
+      return formatCommercialProjectCollectionAnswer()
+    case 'single-project':
+      return project ? generateSingleProjectAnswer(project) : null
+    case 'deep-dive':
+      return getDeepDiveById(context.projectIndex, context.deepDiveId)?.answer || null
+    case 'project-data-boundary':
+      return project ? formatProjectDataBoundaryAnswer(project) : null
+    case 'contact':
+      return [
+        '## 联系方式',
+        '',
+        '- 微信：Sardine0717',
+        '- 手机号码：186 2191 8554',
+        '- 邮箱地址：1641043413@qq.com',
+      ].join('\n')
+    case 'role-fit':
+      return formatRoleFitAnswer(question)
+    default:
+      return null
   }
+}
+
+function buildAgentReply(question, recentProjectIndex = null, context = {}) {
+  void agentResponseGuidelines
+  const structuredFollowUpAnswer = buildStructuredFollowUpAnswer(question, context)
+  if (structuredFollowUpAnswer) return structuredFollowUpAnswer
 
   const normalizedQuestion = normalizeText(question)
+
+  if (isThreeMinuteReadingQuestion(normalizedQuestion)) {
+    return formatReadingPathAnswer()
+  }
+
+  if (isAIUXRoleReadingQuestion(normalizedQuestion)) {
+    return formatAIProjectCollectionAnswer({ roleFocused: true })
+  }
+
+  if (isAIProjectCollectionQuestion(normalizedQuestion)) {
+    return formatAIProjectCollectionAnswer()
+  }
+
+  if (isBEndProjectCollectionQuestion(normalizedQuestion)) {
+    return formatBEndProjectCollectionAnswer()
+  }
+
+  if (isCommercialProjectCollectionQuestion(normalizedQuestion)) {
+    return formatCommercialProjectCollectionAnswer()
+  }
+
+  const specificProject = context.projectIndex
+    ? getProjectKnowledgeByIndex(context.projectIndex)
+    : getProjectByQuestion(question, recentProjectIndex)
+  if (specificProject) {
+    const projectDeepDive = getProjectDeepDiveByQuestion(question, recentProjectIndex, specificProject.index)
+    const availableDeepDive = projectDeepDive?.id === context.excludeDeepDiveId ? null : projectDeepDive
+
+    if (isProjectDataQuestion(question)) {
+      if (availableDeepDive?.intent === 'validation') {
+        return availableDeepDive.answer
+      }
+      return formatProjectDataBoundaryAnswer(specificProject)
+    }
+
+    if (isProjectResponsibilityQuestion(question)) {
+      return formatProjectResponsibilityAnswer(specificProject)
+    }
+
+    if (isProjectBoundaryQuestion(question)) {
+      if (availableDeepDive && ['boundary', 'user-control'].includes(availableDeepDive.intent)) {
+        return availableDeepDive.answer
+      }
+      return formatProjectBoundaryAnswer(specificProject)
+    }
+
+    if (availableDeepDive) {
+      return availableDeepDive.answer
+    }
+
+    if (isSingleProjectIntroQuestion(question) || isBareProjectReference(question, specificProject)) {
+      return generateSingleProjectAnswer(specificProject)
+    }
+
+    if (isProjectTopicQuestion(question)) {
+      return formatProjectTopicAnswer(specificProject)
+    }
+  }
+
   const relevantProjects = findRelevantProjects(question)
   const isBEndTopic = includesAny(normalizedQuestion, ['B 端', 'B端', '后台', '平台型', '平台产品', '复杂后台', '复杂系统', '用户反馈', '运营中枢', '活动搭建', '活动搭投'])
   const isCapabilityEvaluationQuestion = includesAny(normalizedQuestion, ['经验怎么样', '经验如何', '项目深度', '深度如何', '能不能', '能否', '是否', '适合', '有没有', '胜任', '扎实', '能力怎么样', '能力如何'])
@@ -976,7 +1690,7 @@ function buildAgentReply(question) {
   const isAIEngineeringQuestion = includesAny(normalizedQuestion, ['做大模型', '训练模型', '模型训练', '微调模型', '模型微调', '向量数据库', '大模型工程', '懂不懂向量', '会不会训练'])
   const isAIMemorySystemQuestion = includesAny(normalizedQuestion, ['ai memory是什么', 'memory是什么', 'persona是什么', 'socialmatch是什么', 'social match是什么', 'soul项目的ai价值', 'soul 的ai价值', 'ai memory', 'persona', 'socialmatch', 'social match'])
   const isAICapabilityQuestion = (
-    includesAny(normalizedQuestion, ['懂ai产品', 'ai产品经验', 'ai 产品经验', 'ai产品设计岗位', 'ai 产品设计岗位', 'aiux岗位', 'ai ux岗位', '有什么ai产品', 'ai能力体现', 'ai 能力体现'])
+    includesAny(normalizedQuestion, ['懂ai产品', 'ai产品经验', 'ai 产品经验', 'ai产品设计能力', 'ai 产品设计能力', 'ai产品设计岗位', 'ai 产品设计岗位', 'aiux岗位', 'ai ux岗位', '有什么ai产品', 'ai能力体现', 'ai 能力体现'])
     || (includesAny(normalizedQuestion, ['会', '懂', '做过']) && includesAny(normalizedQuestion, ['agent设计', 'agent产品', 'aiagent', 'ai agent']))
     || (includesAny(normalizedQuestion, ['适合']) && includesAny(normalizedQuestion, ['ai产品', 'ai 产品', 'aiux', 'ai ux']))
   )
@@ -1002,7 +1716,6 @@ function buildAgentReply(question) {
     || normalizedQuestion.includes('这个助手')
     || normalizedQuestion.includes('codex')
     || normalizedQuestion.includes('aicoding')
-    || normalizedQuestion.includes('ai产品设计能力')
   )
 
   if (normalizedQuestion.includes('联系') || normalizedQuestion.includes('微信') || normalizedQuestion.includes('电话') || normalizedQuestion.includes('手机') || normalizedQuestion.includes('邮箱')) {
@@ -1118,35 +1831,11 @@ function buildAgentReply(question) {
   }
 
   if (normalizedQuestion.includes('b端') || normalizedQuestion.includes('b 端') || normalizedQuestion.includes('后台') || normalizedQuestion.includes('工单') || normalizedQuestion.includes('活动搭建') || normalizedQuestion.includes('用户反馈')) {
-    const project = findProjectByKeyword(['用户声音', '0 代码', '新活动'])
-    return formatProjectAnswer(project)
+    return formatBEndProjectCollectionAnswer()
   }
 
   if (normalizedQuestion.includes('复杂') || normalizedQuestion.includes('系统')) {
-    return [
-      '## 一句话总结',
-      '',
-      '最能体现复杂系统能力的项目包括 NAWA 编辑器、用户声音统一运营中枢和灵魂记忆。',
-      '',
-      '---',
-      '',
-      '## 核心问题',
-      '',
-      '这些项目都不是单页面设计，而是涉及多角色、多流程、多状态和长期数据沉淀。难点在于让复杂业务可以被稳定理解、配置和协作。',
-      '',
-      '---',
-      '',
-      '## 设计判断',
-      '',
-      '**核心判断：**复杂系统设计的重点不是堆功能，而是把角色边界、流程状态、数据闭环和异常处理设计清楚。',
-      '',
-      '---',
-      '',
-      '## 项目价值',
-      '',
-      '这类项目能体现他从业务机制到产品结构的抽象能力，也能体现跨团队推动复杂项目落地的经验。',
-      ...formatRelatedEvidenceSection(['NAWA 编辑器', '用户声音统一运营中枢', '灵魂记忆']),
-    ].join('\n')
+    return formatBEndProjectCollectionAnswer()
   }
 
   if (normalizedQuestion.includes('商业') || normalizedQuestion.includes('增长') || normalizedQuestion.includes('广告')) {
@@ -1347,7 +2036,24 @@ function MarkdownMessage({ text, onCopyFeedback }) {
   return <div className="agent-markdown">{blocks}</div>
 }
 
-function AgentChatPanel({ className = '', showHeader = true }) {
+function ProjectJumpLinks({ projects, onNavigate }) {
+  if (!projects?.length) return null
+  const isSingleProject = projects.length === 1
+
+  return <div className="agent-project-links" aria-label="回答关联项目">
+    <span>{isSingleProject ? '查看完整项目' : '查看推荐项目'}</span>
+    {projects.map((project) => <button
+      key={project.index}
+      type="button"
+      onClick={() => onNavigate(project)}
+    >
+      <span>{isSingleProject ? '查看完整项目' : '查看项目'} {project.index}：{getProjectJumpTitle(project)}</span>
+      <i aria-hidden="true">→</i>
+    </button>)}
+  </div>
+}
+
+function AgentChatPanel({ className = '', showHeader = true, onProjectNavigate }) {
   const [messages, setMessages] = useState([openingMessage])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -1357,8 +2063,10 @@ function AgentChatPanel({ className = '', showHeader = true }) {
   const chatRef = useRef(null)
   const latestMessageRef = useRef(null)
   const copyToastTimerRef = useRef(null)
+  const recentProjectIndexRef = useRef(null)
+  const askedQuestionsRef = useRef([])
 
-  const suggestions = useMemo(() => portfolioKnowledge.recommendedQuestions, [])
+  const suggestions = initialWelcomeSuggestions
   const quickActions = useMemo(() => [
     {
       label: '一句话了解',
@@ -1409,9 +2117,12 @@ function AgentChatPanel({ className = '', showHeader = true }) {
     }, 2200)
   }
 
-  const submitQuestion = (question) => {
+  const submitQuestion = (question, context = {}) => {
     const trimmedQuestion = question.trim()
     if (!trimmedQuestion || isLoading) return
+
+    const askedQuestions = [...askedQuestionsRef.current, trimmedQuestion]
+    askedQuestionsRef.current = askedQuestions
 
     setHasUsedSuggestions(true)
     setMessages((current) => [...current, { role: 'user', text: trimmedQuestion }])
@@ -1419,10 +2130,53 @@ function AgentChatPanel({ className = '', showHeader = true }) {
     setIsLoading(true)
 
     window.setTimeout(() => {
+      const normalizedQuestion = normalizeText(trimmedQuestion)
+      const isStructuredGlobalQuestion = [
+        'three-minute-guide',
+        'ai-ux-role-guide',
+        'ai-project-collection',
+        'b-end-project-collection',
+        'commercial-project-collection',
+        'contact',
+        'role-fit',
+      ].includes(context.routeKey)
+      const isGlobalQuestion = isStructuredGlobalQuestion
+        || isGlobalGuideOrProjectCollectionQuestion(normalizedQuestion)
+      const matchedProject = isGlobalQuestion
+        ? null
+        : (context.projectIndex
+            ? getProjectKnowledgeByIndex(context.projectIndex)
+            : getProjectByQuestion(trimmedQuestion, recentProjectIndexRef.current))
+      if (matchedProject) recentProjectIndexRef.current = matchedProject.index
+
+      const routedDeepDive = context.routeKey === 'deep-dive'
+        ? getDeepDiveById(context.projectIndex, context.deepDiveId)
+        : null
+      const matchedDeepDive = routedDeepDive || (isGlobalQuestion
+        ? null
+        : getProjectDeepDiveByQuestion(trimmedQuestion, recentProjectIndexRef.current, matchedProject?.index))
+
+      const answerText = buildAgentReply(trimmedQuestion, recentProjectIndexRef.current, {
+        projectIndex: matchedProject?.index,
+        deepDiveId: context.deepDiveId,
+        routeKey: context.routeKey,
+      })
+      const relatedProjects = matchedProject ? [matchedProject] : getRelatedProjectsFromAnswer(answerText)
+      const answerRouteKey = context.routeKey || getAnswerRouteKey(trimmedQuestion, {
+        matchedProject,
+        matchedDeepDive,
+      })
+
       setMessages((current) => [...current, {
         role: 'agent',
-        text: buildAgentReply(trimmedQuestion),
-        followUps: getFollowUpSuggestions(trimmedQuestion),
+        text: answerText,
+        relatedProjects,
+        followUps: getFollowUpSuggestions(trimmedQuestion, {
+          askedQuestions,
+          matchedProject: matchedProject || (relatedProjects.length === 1 ? relatedProjects[0] : null),
+          matchedDeepDive,
+          answerRouteKey,
+        }),
       }])
       setIsLoading(false)
       inputRef.current?.focus()
@@ -1438,6 +2192,20 @@ function AgentChatPanel({ className = '', showHeader = true }) {
     if (event.key !== 'Enter' || event.shiftKey) return
     event.preventDefault()
     submitQuestion(inputValue)
+  }
+
+  const navigateToProject = (project) => {
+    if (project.externalUrl) {
+      onProjectNavigate?.(project)
+      window.location.assign(project.externalUrl)
+      return
+    }
+
+    window.location.hash = `project-${project.index}`
+    onProjectNavigate?.(project)
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    })
   }
 
   return <div className={`agent-panel ${className}`} aria-label="AI Portfolio Agent 聊天面板">
@@ -1470,15 +2238,21 @@ function AgentChatPanel({ className = '', showHeader = true }) {
           {message.role === 'agent'
             ? <div className="agent-response-stack">
               <MarkdownMessage text={message.text} onCopyFeedback={showCopyFeedback} />
+              <ProjectJumpLinks projects={message.relatedProjects} onNavigate={navigateToProject} />
               {message.followUps?.length > 0 && <div className="agent-follow-ups" aria-label="继续追问">
                 <span>继续追问</span>
                 {message.followUps.slice(0, 3).map((followUp) => <button
-                  key={followUp.question}
+                  key={`${followUp.routeKey}-${followUp.projectIndex || 'global'}-${followUp.deepDiveId || followUp.query}`}
                   type="button"
-                  onClick={() => submitQuestion(followUp.question)}
+                  onClick={() => submitQuestion(followUp.query, {
+                    type: followUp.type,
+                    routeKey: followUp.routeKey,
+                    projectIndex: followUp.projectIndex,
+                    deepDiveId: followUp.deepDiveId,
+                  })}
                   disabled={isLoading}
                 >
-                  {followUp.question}
+                  {followUp.query}
                 </button>)}
               </div>}
             </div>
@@ -1552,6 +2326,64 @@ export default function AIPortfolioAgent({ onOpen }) {
 }
 
 export function AIPortfolioAssistantDrawer({ isOpen, onClose }) {
+  const projectNavigationRef = useRef(false)
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    projectNavigationRef.current = false
+
+    const { body, documentElement } = document
+    const scrollY = window.scrollY
+    const scrollbarWidth = window.innerWidth - documentElement.clientWidth
+    const previousStyles = {
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width,
+      bodyOverflow: body.style.overflow,
+      bodyPaddingRight: body.style.paddingRight,
+      htmlOverflow: documentElement.style.overflow,
+      htmlOverscrollBehavior: documentElement.style.overscrollBehavior,
+      htmlScrollBehavior: documentElement.style.scrollBehavior,
+    }
+
+    documentElement.style.overflow = 'hidden'
+    documentElement.style.overscrollBehavior = 'none'
+    documentElement.style.scrollBehavior = 'auto'
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = '0'
+    body.style.right = '0'
+    body.style.width = '100%'
+    body.style.overflow = 'hidden'
+    if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`
+
+    return () => {
+      body.style.position = previousStyles.bodyPosition
+      body.style.top = previousStyles.bodyTop
+      body.style.left = previousStyles.bodyLeft
+      body.style.right = previousStyles.bodyRight
+      body.style.width = previousStyles.bodyWidth
+      body.style.overflow = previousStyles.bodyOverflow
+      body.style.paddingRight = previousStyles.bodyPaddingRight
+      documentElement.style.overflow = previousStyles.htmlOverflow
+      documentElement.style.overscrollBehavior = previousStyles.htmlOverscrollBehavior
+      window.scrollTo({
+        top: projectNavigationRef.current ? 0 : scrollY,
+        left: 0,
+        behavior: 'auto',
+      })
+      documentElement.style.scrollBehavior = previousStyles.htmlScrollBehavior
+    }
+  }, [isOpen])
+
+  const handleProjectNavigate = () => {
+    projectNavigationRef.current = true
+    onClose()
+  }
+
   return <>
     <div className={`assistant-drawer${isOpen ? ' is-open' : ''}`} aria-hidden={!isOpen}>
       <button className="assistant-drawer-backdrop" type="button" aria-label="关闭作品集助手背景层" onClick={onClose} />
@@ -1565,7 +2397,7 @@ export function AIPortfolioAssistantDrawer({ isOpen, onClose }) {
             <X size={20} />
           </button>
         </div>
-        <AgentChatPanel className="is-drawer" showHeader={false} />
+        <AgentChatPanel className="is-drawer" showHeader={false} onProjectNavigate={handleProjectNavigate} />
       </aside>
     </div>
   </>
@@ -1573,7 +2405,7 @@ export function AIPortfolioAssistantDrawer({ isOpen, onClose }) {
 
 export function PortfolioAssistantFab({ onOpen, className = '' }) {
   return <button type="button" className={`portfolio-assistant-fab ${className}`.trim()} onClick={onOpen}>
-    <MessageCircle size={18} />
-    AI作品集小助手
+    <MessageCircle size={20} strokeWidth={2} />
+    <span>AI作品集小助手</span>
   </button>
 }

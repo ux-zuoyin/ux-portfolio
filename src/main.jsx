@@ -307,7 +307,12 @@ function HomePage() {
         </div>
         <div className="project-list" key={activeProjectCategory}>
           {visibleProjects.map((p) => <BorderGlow className="project-glow" key={p.index} data-stagger-item>
-            <a className="project-card project-link" href={`#project-${p.index}`} style={{'--accent': p.accent}} aria-label={`查看项目：${p.title.replace('\n', ' ')}`}>
+            <a
+              className={`project-card project-link${p.coverOnly ? ' is-cover-only' : ''}`}
+              href={p.externalUrl || `#project-${p.index}`}
+              style={{'--accent': p.accent}}
+              aria-label={`${p.externalUrl ? '访问外部项目' : '查看项目'}：${p.title.replace(/\n/g, ' ')}`}
+            >
               <div className="project-cover">
                 <div className="project-media">
                   <TiltedCard
@@ -318,7 +323,7 @@ function HomePage() {
                   />
                 </div>
               </div>
-              <div className="project-info">
+              {!p.coverOnly && <div className="project-info">
                 <div className="project-top"><span>{p.index}</span><span>{p.meta}</span></div>
                 <div className="project-content">
                   <h3>{p.title.replace(/\n/g, ' ')}</h3>
@@ -326,7 +331,7 @@ function HomePage() {
                   <div className="project-tags" aria-label="项目标签">{p.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                 </div>
                 <div className="project-arrow"><ArrowUpRight/></div>
-              </div>
+              </div>}
             </a>
           </BorderGlow>)}
         </div>
@@ -472,15 +477,20 @@ function ProjectDetail({ project }) {
       title="回到顶部"
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
     >
-      <ArrowUp size={22}/>
+      <ArrowUp size={20} strokeWidth={2}/>
     </button>
-    <PortfolioAssistantFab onOpen={() => setIsAssistantOpen(true)} />
+    <PortfolioAssistantFab
+      className={`detail-assistant-fab${isNavScrolled ? ' is-compact' : ''}`}
+      onOpen={() => setIsAssistantOpen(true)}
+    />
     <AIPortfolioAssistantDrawer isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />
   </main>
 }
 
 function App() {
-  const getProjectFromHash = () => projects.find((project) => window.location.hash === `#project-${project.index}`)
+  const getProjectFromHash = () => projects.find((project) => (
+    !project.externalUrl && window.location.hash === `#project-${project.index}`
+  ))
   const [activeProject, setActiveProject] = useState(getProjectFromHash)
   const activeProjectIndexRef = useRef(activeProject?.index || null)
 

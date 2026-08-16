@@ -49,7 +49,7 @@ body .hero-actions a,body .contact-actions a{height:50px;padding:0 20px;border-r
 
 body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.project-glow .project-card,.project-glow .border-glow-inner,.capability-grid article,.portrait-card{border-radius:6px}.project-glow .project-card{overflow:hidden}
 
-.project-glow{height:660px}.project-glow .project-card{height:100%;border:0}.project-glow:hover .project-arrow{background:#ffffff;border-color:#ffffff;transform:rotate(8deg)}@media(min-width:1001px){.work .project-glow{height:560px}}@media(max-width:1000px){.project-glow{height:580px}}@media(max-width:620px){.project-glow{height:500px}}
+.project-glow{height:660px}.work .project-glow{border:0}.project-glow .project-card{height:100%;border:0}.project-glow:hover .project-arrow{background:#ffffff;border-color:#ffffff;transform:rotate(8deg)}@media(min-width:1001px){.work .project-glow{height:560px}}@media(max-width:1000px){.project-glow{height:580px}}@media(max-width:620px){.project-glow{height:500px}}
 
 /* Cinematic motion system */
 .hero-eyebrow-mask,.hero-title-mask,.hero-subtitle-mask{overflow:hidden}.hero-title-mask{width:100%;display:flex;justify-content:center}.hero .hero-media{will-change:transform}.motion-title{position:relative;z-index:0;margin:-.08em 0 .08em;font-family:Impact,'Arial Narrow',sans-serif;font-size:clamp(92px,11vw,190px);line-height:.82;letter-spacing:-.045em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.12);white-space:nowrap;transform-origin:left center;pointer-events:none}.strength .motion-title{transform-origin:right center;text-align:right}.work .motion-title{margin-top:0}.section-label,.experience-intro,.section-heading,.stats,.experience,.capability-grid,.project-list,.contact-inner>h3,.contact-actions{position:relative;z-index:1}.project-media{position:absolute;inset:-8% 0;width:100%;height:116%;overflow:hidden;will-change:transform}.project-card .project-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:transform .9s cubic-bezier(.16,1,.3,1),filter .8s}.project-card:hover .project-media img{transform:scale(1.1)}[data-stagger-item]{will-change:transform,opacity}.contact .motion-title{margin:0 0 7vh;color:#f0eee6;-webkit-text-stroke:0;transform-origin:left center}.contact .contact-inner{overflow:visible}
@@ -259,7 +259,7 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .agent-entry-action{height:32px;padding:0 13px;flex:0 0 auto;border-color:rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.04);color:#ddd;font-size:12px;font-weight:500}
 
 .portfolio-assistant-fab{left:50%;right:auto;bottom:32px;z-index:120;height:56px;min-width:132px;padding:0 20px;gap:8px;border-radius:999px;background:#ffffff;font-size:14px;font-weight:700;letter-spacing:0;transform:translateX(-50%);box-shadow:0 14px 38px rgba(0,0,0,.38),0 8px 28px rgba(255,255,255,.22);animation:assistant-fab-slide-up .42s cubic-bezier(.16,1,.3,1) both}
-.portfolio-assistant-fab svg{width:17px;height:17px}
+.portfolio-assistant-fab svg{width:20px;height:20px}
 .portfolio-assistant-fab:hover{transform:translateX(-50%) translateY(-3px);background:#ffffff;box-shadow:0 20px 48px rgba(0,0,0,.42),0 12px 34px rgba(255,255,255,.3)}
 @keyframes assistant-fab-slide-up{from{opacity:0;transform:translateX(-50%) translateY(28px) scale(.96)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
 
@@ -272,8 +272,8 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .assistant-drawer-topbar{height:76px;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.1);background:rgba(10,10,10,.92)}
 .assistant-drawer-topbar span{display:block;margin:0 0 6px;color:#777;font-size:10px;line-height:1;letter-spacing:.16em}
 .assistant-drawer-topbar strong{display:block;font-size:17px;line-height:1.2;letter-spacing:0}
-.assistant-drawer-close{width:40px;height:40px;border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.04);transition:border-color .2s ease,background-color .2s ease,transform .2s ease}
-.assistant-drawer-close:hover{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.12);transform:none}
+.assistant-drawer-close{width:40px;height:40px;border:0;background:transparent!important;box-shadow:none;transition:color .2s ease,opacity .2s ease,transform .2s ease}
+.assistant-drawer-close:hover{border:0;background:transparent!important;box-shadow:none;opacity:.72;transform:none}
 
 .agent-panel{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(12,13,14,.82);box-shadow:0 34px 90px rgba(0,0,0,.38);backdrop-filter:blur(22px) saturate(1.12);-webkit-backdrop-filter:blur(22px) saturate(1.12)}
 .agent-panel:before{content:'';position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)}
@@ -323,9 +323,16 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 
 .agent-quick-actions{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin:8px 18px 0;padding:0;overflow:visible}
 .agent-panel.is-drawer .agent-quick-actions{margin-left:18px;margin-right:18px}
-.agent-quick-actions button{height:30px;padding:0 11px;border:1px solid rgba(255,255,255,.09);border-radius:999px;background:rgba(255,255,255,.035);color:rgba(255,255,255,.62);font:inherit;font-size:12px;line-height:1;white-space:nowrap;cursor:pointer;transition:background-color .2s ease,border-color .2s ease,color .2s ease,transform .2s ease}
+.agent-quick-actions button{height:30px;padding:0 11px;border:0;border-radius:999px;background:rgba(255,255,255,.035);color:rgba(255,255,255,.62);font:inherit;font-size:12px;line-height:1;white-space:nowrap;cursor:pointer;transition:background-color .2s ease,color .2s ease,transform .2s ease}
 .agent-quick-actions button:hover:not(:disabled){background:rgba(255,255,255,.075);border-color:rgba(255,255,255,.16);color:#fff;transform:translateY(-1px)}
 .agent-quick-actions button:disabled{cursor:not-allowed;opacity:.45}
+
+.agent-project-links{width:100%;display:flex;flex-direction:column;gap:6px;margin:2px 0}
+.agent-project-links>span{margin-bottom:2px;color:rgba(255,255,255,.48);font-size:11px;line-height:1.3}
+.agent-project-links button{width:100%;min-height:40px;padding:9px 12px;border:0;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(85,0,195,.28);color:rgba(255,255,255,.9);font:inherit;font-size:12px;line-height:1.45;text-align:left;cursor:pointer;transition:background-color .2s ease,color .2s ease,transform .2s ease}
+.agent-project-links button span{min-width:0}
+.agent-project-links button i{flex:0 0 auto;color:rgba(255,255,255,.58);font-style:normal}
+.agent-project-links button:hover{background:#5500C3;color:#fff;transform:translateY(-1px)}
 
 .agent-follow-ups{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 2px}
 .agent-follow-ups>span{flex:0 0 100%;color:rgba(255,255,255,.4);font-size:11px;line-height:1.3}
@@ -334,8 +341,8 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .agent-follow-ups button:focus-visible{outline:0;border-color:rgba(255,255,255,.45);box-shadow:0 0 0 2px rgba(255,255,255,.14);color:#fff}
 .agent-follow-ups button:disabled{cursor:not-allowed;opacity:.45}
 
-.agent-input-row.agent-composer{display:flex;flex:0 0 auto;flex-direction:column;gap:10px;margin:14px 18px 18px;padding:13px 13px 11px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(24,25,27,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);transition:border-color .22s ease,background-color .22s ease,box-shadow .22s ease}
-.agent-input-row.agent-composer:focus-within{border-color:rgba(255,255,255,.2);background:rgba(29,30,32,.96);box-shadow:0 0 0 1px rgba(255,255,255,.025),inset 0 1px 0 rgba(255,255,255,.045)}
+.agent-input-row.agent-composer{display:flex;flex:0 0 auto;flex-direction:column;gap:10px;margin:14px 18px 18px;padding:13px 13px 11px;border:0;border-radius:18px;background:rgba(24,25,27,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);transition:background-color .22s ease,box-shadow .22s ease}
+.agent-input-row.agent-composer:focus-within{border:0;background:rgba(29,30,32,.96);box-shadow:inset 0 1px 0 rgba(255,255,255,.045)}
 .agent-input-row.agent-composer textarea{width:100%;min-height:56px;max-height:140px;padding:3px 2px 0;border:0;border-radius:0;background:transparent;color:#f4f4f4;font:inherit;font-size:14px;line-height:1.65;outline:none;resize:none;overflow-y:auto}
 .agent-input-row.agent-composer textarea::placeholder{color:rgba(255,255,255,.38)}
 .agent-composer-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -343,9 +350,9 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .agent-composer-meta svg{color:rgba(255,255,255,.38)}
 .agent-input-row.agent-composer button{position:static;width:auto;min-width:72px;height:34px;padding:0 12px;border:0;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#ffffff;color:#fff;font-size:13px;font-weight:700;line-height:1;box-shadow:0 8px 18px rgba(255,255,255,.22);cursor:pointer;transition:transform .2s ease,background-color .2s ease,color .2s ease,opacity .2s ease}
 .agent-input-row.agent-composer button span{display:inline-block}
-.agent-input-row.agent-composer button:disabled{cursor:not-allowed;background:#ffffff;color:#fff;opacity:.86;box-shadow:0 8px 18px rgba(255,255,255,.18)}
+.agent-input-row.agent-composer button:disabled{cursor:not-allowed;background:rgba(255,255,255,.14)!important;color:rgba(255,255,255,.38)!important;opacity:1;box-shadow:none}
 .agent-input-row.agent-composer button:hover:not(:disabled){transform:translateY(-1px);background:#ffffff}
-.agent-input-row.agent-composer button:disabled:hover{transform:none;background:#ffffff}
+.agent-input-row.agent-composer button:disabled:hover{transform:none;background:rgba(255,255,255,.14)!important;color:rgba(255,255,255,.38)!important}
 
 .agent-message .agent-markdown li.agent-contact-copy-item{display:flex;align-items:center;gap:8px;padding:0 0 0 2px;border:0;border-radius:0;background:transparent}
 .agent-contact-copy-item>span{min-width:0}
@@ -486,9 +493,18 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .work .project-tags span{border:0!important;background:rgba(255,255,255,.08)!important;color:#bbb}
 #work .project-content h3{font-size:20px!important;line-height:1.3}
 .agent-message.assistant-message .agent-avatar{border:0!important}
-.agent-message.user-message p{border:0!important}
+.agent-message.user-message p{border:0!important;background:#5500C3!important;color:#fff!important}
 .agent-follow-ups button{border:0!important}
 .contact-actions .contact-secondary{border:0!important;background:rgba(255,255,255,.1)!important;color:#ddd}
 @media(hover:hover){.contact-actions .contact-secondary:hover{background:#5500C3!important;border-color:#5500C3!important;color:#fff!important}}
 @media(hover:hover){.contact-actions .contact-primary:hover{box-shadow:0 10px 28px rgba(85,0,195,.38)!important}}
 .portfolio-assistant-fab.home-assistant-fab:hover{transform:none!important;background:#fff!important;border-color:#fff!important;color:#111!important;box-shadow:0 14px 38px rgba(0,0,0,.38),0 8px 28px rgba(255,255,255,.22)!important}
+
+/* Detail-page floating actions: assistant at bottom-right, back-to-top above it. */
+.project-detail .portfolio-assistant-fab.detail-assistant-fab{left:auto;right:32px;bottom:32px;width:174px;min-width:56px;transform:none;overflow:hidden;white-space:nowrap;animation:home-assistant-fab-slide-up .42s cubic-bezier(.16,1,.3,1) both;transition:width .32s cubic-bezier(.16,1,.3,1),padding .32s cubic-bezier(.16,1,.3,1),gap .32s cubic-bezier(.16,1,.3,1),border-radius .32s ease,transform .25s ease,box-shadow .25s ease}
+.project-detail .portfolio-assistant-fab.detail-assistant-fab span{max-width:120px;overflow:hidden;opacity:1;transition:max-width .28s cubic-bezier(.16,1,.3,1),opacity .18s ease}
+.project-detail .portfolio-assistant-fab.detail-assistant-fab.is-compact{width:56px;padding:0;gap:0;border-radius:50%}
+.project-detail .portfolio-assistant-fab.detail-assistant-fab.is-compact span{max-width:0;opacity:0}
+.project-detail .portfolio-assistant-fab.detail-assistant-fab:hover{transform:translateY(-3px)}
+.project-detail .back-to-top{right:32px;bottom:104px}
+.project-detail .portfolio-assistant-fab.detail-assistant-fab:hover{background:#fff!important;border-color:#fff!important;color:#111!important;box-shadow:0 20px 48px rgba(0,0,0,.42),0 12px 34px rgba(255,255,255,.3)!important}

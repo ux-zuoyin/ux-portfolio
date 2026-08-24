@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hero Transparent Video QA</title><style>
+*{box-sizing:border-box}body{margin:0;background:#151515;color:#fff;font:14px/1.5 system-ui,sans-serif}
+header{padding:22px 24px;border-bottom:1px solid #333}h1{margin:0 0 5px;font-size:20px}p{margin:0;color:#aaa}
+main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#333}
+.panel{min-height:calc(100vh - 94px);display:grid;grid-template-rows:auto 1fr;padding:16px}.panel h2{margin:0;font-size:13px}
+.stage{display:grid;place-items:center;overflow:hidden}video{display:block;width:100%;height:auto;max-height:calc(100vh - 150px);object-fit:contain}
+.black{background:#000}.purple{background:#5500c3}.white{background:#fff;color:#111}
+@media(max-width:900px){main{grid-template-columns:1fr}.panel{min-height:70vh}}
+</style></head><body><header><h1>透明 Hero 视频三色背景检查</h1><p>U²-Net multi-pass semantic matting · 1272×718 · VP9 Alpha</p></header>
+<main><section class="panel black"><h2>黑色背景</h2><div class="stage"><video autoplay muted loop playsinline preload="auto" poster="hero-character-poster.png" src="hero-character.webm"></video></div></section><section class="panel purple"><h2>紫色背景</h2><div class="stage"><video autoplay muted loop playsinline preload="auto" poster="hero-character-poster.png" src="hero-character.webm"></video></div></section><section class="panel white"><h2>白色背景</h2><div class="stage"><video autoplay muted loop playsinline preload="auto" poster="hero-character-poster.png" src="hero-character.webm"></video></div></section></main>
+</body></html>

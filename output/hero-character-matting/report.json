@@ -1,0 +1,23 @@
+{
+  "input": "/Users/sardine/Downloads/视频 (1).mp4",
+  "method": "U²-Net multi-pass semantic matting + guided edge refinement + bidirectional optical-flow temporal smoothing + white-matte decontamination",
+  "model_type": "u2net",
+  "anchor_step": 1,
+  "frame_count": 193,
+  "fps": 24.0,
+  "source_size": [
+    1280,
+    720
+  ],
+  "union_crop": [
+    2,
+    2,
+    1274,
+    720
+  ],
+  "output_size": [
+    1272,
+    718
+  ],
+  "webm_bytes": 2565024
+}

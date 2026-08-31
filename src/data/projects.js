@@ -35,7 +35,7 @@ export const projects = [
     detailTitle: '灵魂记忆\nAI动态画像的可信与可控体验设计',
     detailSubtitle: '围绕信息分级、用户确认、画像生成与展示控制，建立一套用户可理解、可纠错、可管理的动态画像体验',
     assistantBrief: '灵魂记忆是围绕 Soul 兴趣社交场景设计的 AI 动态画像项目，解决 AI 自动理解用户时可能误判、过度标签化和用户失去控制的问题。左胤负责信息分级、候选记忆确认、画像生成与展示控制等体验设计，体现 AI 信任、用户控制、Agent 边界和复杂系统一致性设计能力。',
-    detailMedia: Array.from({ length: 10 }, (_, index) => assetUrl(`project-memory/${String(index).padStart(2, '0')}.jpg`)),
+    detailMedia: Array.from({ length: 10 }, (_, index) => assetUrl(`project-memory/${String(index).padStart(2, '0')}.webp`)),
   }),
   {
     index: '04',
@@ -47,7 +47,7 @@ export const projects = [
     accent: '#ffffff',
     category: 'UX体验设计',
     assistantBrief: '多任务福利积分页是商业化激励活动体验项目，解决活动玩法增多后用户难以判断收益、成本和下一步操作的问题。左胤负责数据分析、体验诊断、信息层级、任务状态和活动卡片规则设计，体现增长体验、多任务决策、状态驱动体验和上线数据复盘能力。',
-    detailMedia: Array.from({ length: 9 }, (_, index) => assetUrl(`project-welfare/${String(index).padStart(2, '0')}.jpg`)),
+    detailMedia: Array.from({ length: 9 }, (_, index) => assetUrl(`project-welfare/${String(index).padStart(2, '0')}.webp`)),
   },
   {
     index: '02',

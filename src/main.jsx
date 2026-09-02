@@ -274,11 +274,11 @@ function HomePage() {
     <section className="experience-section section" id="experience" data-motion-section>
       <div className="shell">
       <div className="experience-intro">
-        <div><div className="status"><i/> SENIOR UX / PRODUCT DESIGNER</div><h2>Hi 我是左胤<br/>资深UX产品体验设计师</h2></div>
-        <p>花名沙丁鱼，10年UI/UX产品体验设计经验，前SoulAPP资深UX体验设计师。<br/><br/>具备C端社区内容、B端复杂工具、AI产品及多终端设计经验，擅长从用户问题与业务目标出发，完成需求洞察、体验判断、复杂流程与边界设计，并推动方案从原型验证到研发落地。<br/><br/>兼具结构化交互与视觉表达能力，熟悉数据反馈、设计规范及跨团队协作，可结合AI Coding 快速搭建高保真交互Demo，提升方案验证与交付效率。</p>
+        <div><div className="status"><i/> UX / PRODUCT DESIGNER</div><h2>Hi 我是左胤<br/>UX体验设计师</h2></div>
+        <p>前 Soul APP 用户体验设计师，近几年主要聚焦复杂产品与 AI 体验，具备 C 端社区与商业化、内容工具、B 端复杂系统及鸿蒙多端项目经验。<br/><br/>擅长从业务目标和用户问题出发，完成问题定义、信息架构、复杂流程、关键交互与 UI 视觉设计，并通过原型验证、数据反馈和跨团队协作推动方案落地。<br/><br/>将 AI 辅助分析、视觉生成与 Coding 原型融入日常设计流程，以更低成本验证关键判断，提升方案沟通与交付效率。</p>
       </div>
       <div className="stats">
-          <div data-stagger-item><strong>10<sup>+</sup></strong><span>年设计经验</span></div><div data-stagger-item><strong>4<sup>+</sup></strong><span>业务领域</span></div><div data-stagger-item><strong>30<sup>+</sup></strong><span>核心项目</span></div><div data-stagger-item><strong>0→1<sup className="stat-spacer" aria-hidden="true">+</sup></strong><span>复杂产品搭建</span></div>
+          <div data-stagger-item><strong>C / B / AI</strong><span>产品类型</span></div><div data-stagger-item><strong>10<sup>+</sup></strong><span>复杂系统与工具</span></div><div data-stagger-item><strong>30<sup>+</sup></strong><span>核心项目</span></div><div data-stagger-item><strong>0→1<sup className="stat-spacer" aria-hidden="true">+</sup></strong><span>产品搭建与落地</span></div>
       </div>
       <div className="experience">
         <div className="experience-title">CAREER PATH <span>2016 — 2026</span></div>

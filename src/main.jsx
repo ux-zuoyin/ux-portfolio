@@ -7,7 +7,6 @@ import './styles.css'
 import BorderGlow from './components/BorderGlow'
 import DotField from './components/DotField'
 import TiltedCard from './components/TiltedCard'
-import TargetCursor from './components/TargetCursor'
 import { AIPortfolioAssistantDrawer, PortfolioAssistantFab } from './components/AIPortfolioAgent'
 import { projects, projectCategories } from './data/projects'
 
@@ -535,12 +534,6 @@ function App() {
   }, [])
 
   return <>
-    <TargetCursor
-      targetSelector="a, button, .project-card, .capability-grid article"
-      spinDuration={2}
-      hideDefaultCursor
-      parallaxOn
-    />
     {activeProject ? <ProjectDetail project={activeProject}/> : <HomePage/>}
   </>
 }

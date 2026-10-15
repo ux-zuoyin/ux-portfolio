@@ -531,3 +531,10 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .work .project-link:focus-visible .project-top,.work .project-link:focus-visible .project-content p{color:rgba(255,255,255,.86)}
 .work .project-link:focus-visible .project-tags span{background:rgba(255,255,255,.18)!important;color:#fff!important}
 .work .project-link:focus-visible .project-arrow{background:#fff!important;border-color:#fff!important;color:#5500C3!important}
+
+/* Project arrow: clockwise on hover, counter-clockwise on leave */
+.work .project-arrow{transform:none!important}
+.work .project-arrow svg{transform:rotate(0deg);transition:transform .72s cubic-bezier(.16,1,.3,1)}
+@media(hover:hover){.work .project-glow:hover .project-arrow svg{transform:rotate(360deg)}}
+.work .project-link:focus-visible .project-arrow svg{transform:rotate(360deg)}
+@media(prefers-reduced-motion:reduce){.work .project-arrow svg{transition:none}}

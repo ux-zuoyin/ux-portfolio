@@ -15,6 +15,13 @@ gsap.registerPlugin(ScrollTrigger)
 
 const scrollToPageTop = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
 const detailReturnTargetKey = 'portfolio:return-to-work'
+const projectCategoryLabels = {
+  '全部': '全部',
+  'UX体验设计': '核心UX项目',
+  '个人项目自驱': 'AI实践探索',
+  'C端项目视觉': 'UI视觉作品',
+  '创作者与生产力平台': 'B端复杂系统',
+}
 
 const markDetailReturnToWork = () => {
   window.sessionStorage.setItem(detailReturnTargetKey, '1')
@@ -301,11 +308,14 @@ function HomePage() {
             aria-selected={activeProjectCategory === category}
             onClick={() => setActiveProjectCategory(category)}
           >
-            {category}
+            {projectCategoryLabels[category] || category}
             {category === 'UX体验设计' && <span className="project-tab-badge">HOT</span>}
           </button>)}
         </div>
         <div className="project-list" key={activeProjectCategory}>
+          {activeProjectCategory === 'C端项目视觉' && visibleProjects.length === 0 && <div className="project-empty-state" role="status">
+            <p>作者正在疯狂爆肝补充作品</p>
+          </div>}
           {visibleProjects.map((p) => <BorderGlow className="project-glow" key={p.index} data-stagger-item>
             <a
               className={`project-card project-link${p.coverOnly ? ' is-cover-only' : ''}`}
@@ -455,7 +465,9 @@ function ProjectDetail({ project }) {
       <div className="shell detail-intro">
         <div className="detail-intro-grid">
           <h2>{project.title.split('\n').map((line) => <React.Fragment key={line}>{line}<br/></React.Fragment>)}</h2>
-          <p>{project.description}</p>
+          <p className={project.detailDemoUrl ? 'detail-demo-copy' : undefined}>{project.detailDemoUrl
+            ? <>高保真演示：<a className="detail-demo-link" href={project.detailDemoUrl} target="_blank" rel="noreferrer">{project.detailDemoUrl}</a></>
+            : project.description}</p>
         </div>
       </div>
       <div className="shell detail-media-stack">

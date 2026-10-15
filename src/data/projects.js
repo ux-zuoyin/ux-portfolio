@@ -4,6 +4,7 @@ export const projectCategories = [
   '全部',
   'UX体验设计',
   '个人项目自驱',
+  'C端项目视觉',
   '创作者与生产力平台',
 ]
 
@@ -171,4 +172,15 @@ export const projects = [
     category: '个人项目自驱',
     externalUrl: 'https://bikelabfeel.top/',
   },
+  createProjectTemplate('11', {
+    title: '迅雷云盘\nPC端核心体验重构与交互原型实践',
+    description: '从信息架构到高保真交互实现，探索设计与 AI Coding 协同的体验验证方式',
+    tags: ['PC端实践', '体验设计'],
+    categories: ['UX体验设计', '个人项目自驱'],
+    image: assetUrl('project-covers/11.jpg'),
+    detailTitle: '迅雷云盘\nPC端核心体验重构与交互原型实践',
+    detailSubtitle: '从信息架构到高保真交互实现，探索设计与 AI Coding 协同的体验验证方式',
+    detailDemoUrl: 'https://xunleidemo.vercel.app/',
+    detailMedia: Array.from({ length: 5 }, (_, index) => assetUrl(`project-11/${String(index + 1).padStart(2, '0')}.webp`)),
+  }),
 ]

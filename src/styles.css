@@ -507,4 +507,6 @@ body .hero-actions a,body .contact-actions a{border-radius:6px}.project-glow,.pr
 .project-detail .portfolio-assistant-fab.detail-assistant-fab.is-compact span{max-width:0;opacity:0}
 .project-detail .portfolio-assistant-fab.detail-assistant-fab:hover{transform:translateY(-3px)}
 .project-detail .back-to-top{right:32px;bottom:104px}
+.detail-demo-copy{text-align:right}.detail-demo-link{color:#fff42c;text-decoration:underline;text-decoration-color:rgba(255,244,44,.6);text-underline-offset:.22em;transition:color .2s ease,text-decoration-color .2s ease}.detail-demo-link:hover{color:#fff42c;text-decoration-color:currentColor}
 .project-detail .portfolio-assistant-fab.detail-assistant-fab:hover{background:#fff!important;border-color:#fff!important;color:#111!important;box-shadow:0 20px 48px rgba(0,0,0,.42),0 12px 34px rgba(255,255,255,.3)!important}
+.project-empty-state{grid-column:1/-1;min-height:300px;display:grid;place-items:center;border:1px dashed rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.025);text-align:center}.project-empty-state p{margin:0;color:#888;font-size:16px;letter-spacing:.04em}

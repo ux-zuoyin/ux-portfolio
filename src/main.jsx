@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { AlertCircle, ArrowLeft, ArrowUp, ArrowUpRight, Check, MessageCircle, Phone, Sparkles } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowUp, ArrowUpRight, Check, MessageCircle, Minus, Phone, Plus, RotateCcw, Sparkles } from 'lucide-react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
@@ -413,10 +413,75 @@ function DetailMediaItem({ media, label, isVideo }) {
   </figure>
 }
 
+const DETAIL_ZOOM_MIN = 40
+const DETAIL_ZOOM_MAX = 100
+const DETAIL_ZOOM_STEP = 5
+const DETAIL_ZOOM_DEFAULT = 75
+
+function DetailZoomControls({ value, onChange }) {
+  const updateZoom = (nextValue) => {
+    onChange(Math.min(DETAIL_ZOOM_MAX, Math.max(DETAIL_ZOOM_MIN, nextValue)))
+  }
+
+  return <div className="detail-zoom-controls" role="group" aria-label="作品图片缩放控制">
+    <button
+      type="button"
+      aria-label="缩小作品图片"
+      title="缩小"
+      disabled={value <= DETAIL_ZOOM_MIN}
+      onClick={() => updateZoom(value - DETAIL_ZOOM_STEP)}
+    >
+      <Minus size={17}/>
+    </button>
+    <input
+      type="range"
+      min={DETAIL_ZOOM_MIN}
+      max={DETAIL_ZOOM_MAX}
+      step={DETAIL_ZOOM_STEP}
+      value={value}
+      aria-label="作品图片缩放比例"
+      aria-valuetext={`${value}%`}
+      onChange={(event) => updateZoom(Number(event.target.value))}
+      style={{ '--zoom-progress': `${((value - DETAIL_ZOOM_MIN) / (DETAIL_ZOOM_MAX - DETAIL_ZOOM_MIN)) * 100}%` }}
+    />
+    <button
+      type="button"
+      aria-label="放大作品图片"
+      title="放大"
+      disabled={value >= DETAIL_ZOOM_MAX}
+      onClick={() => updateZoom(value + DETAIL_ZOOM_STEP)}
+    >
+      <Plus size={17}/>
+    </button>
+    <output className="detail-zoom-value" aria-live="polite">{value}%</output>
+    <span className="detail-zoom-divider" aria-hidden="true"/>
+    <button
+      type="button"
+      className="detail-zoom-reset"
+      aria-label={`重置为 ${DETAIL_ZOOM_DEFAULT}%`}
+      title={`重置为 ${DETAIL_ZOOM_DEFAULT}%`}
+      disabled={value === DETAIL_ZOOM_DEFAULT}
+      onClick={() => updateZoom(DETAIL_ZOOM_DEFAULT)}
+    >
+      <RotateCcw size={16}/><span>重置</span>
+    </button>
+  </div>
+}
+
 function ProjectDetail({ project }) {
   const detailRef = useRef(null)
   const [isNavScrolled, setIsNavScrolled] = useState(false)
   const [isAssistantOpen, setIsAssistantOpen] = useState(false)
+  const [detailZoom, setDetailZoom] = useState(DETAIL_ZOOM_DEFAULT)
+
+  useEffect(() => {
+    setDetailZoom(DETAIL_ZOOM_DEFAULT)
+  }, [project.index])
+
+  useEffect(() => {
+    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 340)
+    return () => window.clearTimeout(refreshTimer)
+  }, [detailZoom])
 
   useEffect(() => {
     const updateNav = () => setIsNavScrolled(window.scrollY > 80)
@@ -469,7 +534,7 @@ function ProjectDetail({ project }) {
             : project.description}</p>
         </div>
       </div>
-      <div className="shell detail-media-stack">
+      <div className="shell detail-media-stack" style={{ '--detail-media-scale': `${detailZoom}%` }}>
         {(project.detailMedia || [project.image]).map((media, index) => {
           const isVideo = media.toLowerCase().endsWith('.mp4')
           return <DetailMediaItem
@@ -481,6 +546,7 @@ function ProjectDetail({ project }) {
         })}
       </div>
     </section>
+    <DetailZoomControls value={detailZoom} onChange={setDetailZoom}/>
     <button
       className="back-to-top"
       type="button"

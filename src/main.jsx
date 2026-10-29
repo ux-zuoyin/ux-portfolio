@@ -1,12 +1,13 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { AlertCircle, ArrowLeft, ArrowUp, ArrowUpRight, Check, MessageCircle, Minus, Phone, Plus, RotateCcw, Sparkles } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowUp, ArrowUpRight, Check, Flame, MessageCircle, Phone, Sparkles } from 'lucide-react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
 import BorderGlow from './components/BorderGlow'
 import DotField from './components/DotField'
 import TiltedCard from './components/TiltedCard'
+import ProjectMinimap from './components/ProjectMinimap'
 import { AIPortfolioAssistantDrawer, PortfolioAssistantFab } from './components/AIPortfolioAgent'
 import { projects, projectCategories } from './data/projects'
 
@@ -19,8 +20,15 @@ const projectCategoryLabels = {
   'UX体验设计': '核心UX项目',
   '个人项目自驱': 'AI实践探索',
   'C端项目视觉': 'UI视觉作品',
-  '创作者与生产力平台': 'B端复杂系统',
+  '桌面客户端': '桌面客户端',
+  'B端业务平台': 'B端业务平台',
 }
+const projectCategoryCounts = Object.fromEntries(projectCategories.map((category) => [
+  category,
+  category === '全部'
+    ? projects.length
+    : projects.filter((project) => project.category === category || project.categories?.includes(category)).length,
+]))
 
 const markDetailReturnToWork = () => {
   window.sessionStorage.setItem(detailReturnTargetKey, '1')
@@ -90,7 +98,7 @@ function HomePage() {
       || project.categories?.includes(activeProjectCategory)
     )))
     .slice()
-    .sort((a, b) => Number(a.index) - Number(b.index))
+    .sort((a, b) => Number(Boolean(b.recommended)) - Number(Boolean(a.recommended)) || Number(a.index) - Number(b.index))
 
   const showCopyToast = (message, success) => {
     window.clearTimeout(toastTimerRef.current)
@@ -308,6 +316,7 @@ function HomePage() {
             onClick={() => setActiveProjectCategory(category)}
           >
             {projectCategoryLabels[category] || category}
+            <span className="project-tab-count">{projectCategoryCounts[category]}</span>
             {category === 'UX体验设计' && <span className="project-tab-badge">HOT</span>}
           </button>)}
         </div>
@@ -335,7 +344,10 @@ function HomePage() {
               {!p.coverOnly && <div className="project-info">
                 <div className="project-top"><span>{p.index}</span><span>{p.meta}</span></div>
                 <div className="project-content">
-                  <h3>{p.title.replace(/\n/g, ' ')}</h3>
+                  <h3 className={p.recommended && activeProjectCategory !== '全部' ? 'has-recommendation' : undefined}>
+                    {p.recommended && activeProjectCategory !== '全部' && <Flame className="project-recommended-icon" size={18} strokeWidth={2.2} fill="currentColor" aria-hidden="true"/>}
+                    <span>{p.title.replace(/\n/g, ' ')}</span>
+                  </h3>
                   <p>{p.description}</p>
                   <div className="project-tags" aria-label="项目标签">{p.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                 </div>
@@ -413,75 +425,12 @@ function DetailMediaItem({ media, label, isVideo }) {
   </figure>
 }
 
-const DETAIL_ZOOM_MIN = 40
-const DETAIL_ZOOM_MAX = 100
-const DETAIL_ZOOM_STEP = 5
-const DETAIL_ZOOM_DEFAULT = 75
-
-function DetailZoomControls({ value, onChange }) {
-  const updateZoom = (nextValue) => {
-    onChange(Math.min(DETAIL_ZOOM_MAX, Math.max(DETAIL_ZOOM_MIN, nextValue)))
-  }
-
-  return <div className="detail-zoom-controls" role="group" aria-label="作品图片缩放控制">
-    <button
-      type="button"
-      aria-label="缩小作品图片"
-      title="缩小"
-      disabled={value <= DETAIL_ZOOM_MIN}
-      onClick={() => updateZoom(value - DETAIL_ZOOM_STEP)}
-    >
-      <Minus size={17}/>
-    </button>
-    <input
-      type="range"
-      min={DETAIL_ZOOM_MIN}
-      max={DETAIL_ZOOM_MAX}
-      step={DETAIL_ZOOM_STEP}
-      value={value}
-      aria-label="作品图片缩放比例"
-      aria-valuetext={`${value}%`}
-      onChange={(event) => updateZoom(Number(event.target.value))}
-      style={{ '--zoom-progress': `${((value - DETAIL_ZOOM_MIN) / (DETAIL_ZOOM_MAX - DETAIL_ZOOM_MIN)) * 100}%` }}
-    />
-    <button
-      type="button"
-      aria-label="放大作品图片"
-      title="放大"
-      disabled={value >= DETAIL_ZOOM_MAX}
-      onClick={() => updateZoom(value + DETAIL_ZOOM_STEP)}
-    >
-      <Plus size={17}/>
-    </button>
-    <output className="detail-zoom-value" aria-live="polite">{value}%</output>
-    <span className="detail-zoom-divider" aria-hidden="true"/>
-    <button
-      type="button"
-      className="detail-zoom-reset"
-      aria-label={`重置为 ${DETAIL_ZOOM_DEFAULT}%`}
-      title={`重置为 ${DETAIL_ZOOM_DEFAULT}%`}
-      disabled={value === DETAIL_ZOOM_DEFAULT}
-      onClick={() => updateZoom(DETAIL_ZOOM_DEFAULT)}
-    >
-      <RotateCcw size={16}/><span>重置</span>
-    </button>
-  </div>
-}
-
 function ProjectDetail({ project }) {
   const detailRef = useRef(null)
+  const detailContentRef = useRef(null)
+  const detailMediaStackRef = useRef(null)
   const [isNavScrolled, setIsNavScrolled] = useState(false)
   const [isAssistantOpen, setIsAssistantOpen] = useState(false)
-  const [detailZoom, setDetailZoom] = useState(DETAIL_ZOOM_DEFAULT)
-
-  useEffect(() => {
-    setDetailZoom(DETAIL_ZOOM_DEFAULT)
-  }, [project.index])
-
-  useEffect(() => {
-    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 340)
-    return () => window.clearTimeout(refreshTimer)
-  }, [detailZoom])
 
   useEffect(() => {
     const updateNav = () => setIsNavScrolled(window.scrollY > 80)
@@ -525,7 +474,7 @@ function ProjectDetail({ project }) {
       </header>
     </section>
 
-    <section className="detail-body">
+    <section className="detail-body" ref={detailContentRef}>
       <div className="shell detail-intro">
         <div className="detail-intro-grid">
           <h2>{project.title.split('\n').map((line) => <React.Fragment key={line}>{line}<br/></React.Fragment>)}</h2>
@@ -534,7 +483,7 @@ function ProjectDetail({ project }) {
             : project.description}</p>
         </div>
       </div>
-      <div className="shell detail-media-stack" style={{ '--detail-media-scale': `${detailZoom}%` }}>
+      <div className="shell detail-media-stack" ref={detailMediaStackRef} style={{ '--detail-media-scale': '75%' }}>
         {(project.detailMedia || [project.image]).map((media, index) => {
           const isVideo = media.toLowerCase().endsWith('.mp4')
           return <DetailMediaItem
@@ -546,7 +495,12 @@ function ProjectDetail({ project }) {
         })}
       </div>
     </section>
-    <DetailZoomControls value={detailZoom} onChange={setDetailZoom}/>
+    <ProjectMinimap
+      contentRef={detailContentRef}
+      mediaStackRef={detailMediaStackRef}
+      projectIndex={project.index}
+      media={project.detailMedia || [project.image]}
+    />
     <button
       className="back-to-top"
       type="button"

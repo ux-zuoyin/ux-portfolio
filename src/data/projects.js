@@ -5,7 +5,8 @@ export const projectCategories = [
   'UX体验设计',
   '个人项目自驱',
   'C端项目视觉',
-  '创作者与生产力平台',
+  '桌面客户端',
+  'B端业务平台',
 ]
 
 export const createProjectTemplate = (index, overrides = {}) => {
@@ -35,8 +36,9 @@ export const projects = [
     image: assetUrl('project-covers/01.jpg'),
     detailTitle: '灵魂记忆\nAI动态画像的可信与可控体验设计',
     detailSubtitle: '围绕信息分级、用户确认、画像生成与展示控制，建立一套用户可理解、可纠错、可管理的动态画像体验',
+    recommended: true,
     assistantBrief: '灵魂记忆是围绕 Soul 兴趣社交场景设计的 AI 动态画像项目，解决 AI 自动理解用户时可能误判、过度标签化和用户失去控制的问题。左胤负责信息分级、候选记忆确认、画像生成与展示控制等体验设计，体现 AI 信任、用户控制、Agent 边界和复杂系统一致性设计能力。',
-    detailMedia: Array.from({ length: 10 }, (_, index) => assetUrl(`project-memory/${String(index).padStart(2, '0')}.webp`)),
+    detailMedia: Array.from({ length: 9 }, (_, index) => assetUrl(`project-memory/${String(index + 1).padStart(2, '0')}.webp`)),
   }),
   {
     index: '04',
@@ -47,6 +49,7 @@ export const projects = [
     image: assetUrl('project-covers/04.jpg'),
     accent: '#ffffff',
     category: 'UX体验设计',
+    recommended: true,
     assistantBrief: '多任务福利积分页是商业化激励活动体验项目，解决活动玩法增多后用户难以判断收益、成本和下一步操作的问题。左胤负责数据分析、体验诊断、信息层级、任务状态和活动卡片规则设计，体现增长体验、多任务决策、状态驱动体验和上线数据复盘能力。',
     detailMedia: Array.from({ length: 9 }, (_, index) => assetUrl(`project-welfare/${String(index).padStart(2, '0')}.webp`)),
   },
@@ -62,6 +65,7 @@ export const projects = [
     detailSubtitle: '实现从「不敢发」到「发得好」的体验跃迁',
     assistantBrief: 'AIGC 发布器是面向社区内容创作的 AI 辅助发布项目，解决用户不知道发什么、担心表达不好和缺少反馈的问题。左胤负责发布链路、AI 辅助节点、编辑确认和确定性反馈体验设计，体现 AIGC 工具、内容生产流程、用户控制和 AI UX 设计能力。',
     category: 'UX体验设计',
+    recommended: true,
     detailMedia: Array.from({ length: 8 }, (_, index) => {
       const number = index + 1
       return assetUrl(`project-01/1-${number}.webp`)
@@ -102,7 +106,7 @@ export const projects = [
     tags: ['3D 资产', '复杂系统', '协同平台'],
     image: assetUrl('project-covers/05.jpg'),
     accent: '#ffffff',
-    category: '创作者与生产力平台',
+    category: '桌面客户端',
     assistantBrief: '项目 05 是围绕 NAWA 特效编辑器与 Soul 3D 资产配置链路展开的 B 端生产工具体验重构，覆盖 2D 特效、3D 头套、场景配置、预览与投放管理。项目解决复杂对象管理困难、配置逻辑难理解、预览与上线结果不一致，以及跨团队链路冗长的问题。左胤负责驻场调研、复杂对象与任务模型梳理、编辑配置、事件编排、预览闭环和参数组件化设计，体现复杂信息架构、配置降本、流程编排和专业生产工具 UX 能力。',
     detailMedia: [
       '1.webp',
@@ -134,7 +138,7 @@ export const projects = [
     tags: ['用户反馈', '运营中枢', '数据闭环'],
     image: assetUrl('project-covers/06.jpg'),
     accent: '#ffffff',
-    category: '创作者与生产力平台',
+    category: 'B端业务平台',
     assistantBrief: '用户声音统一运营中枢是面向客服、产品和运营的反馈管理后台，解决反馈、投诉和需求流转分散导致的问题归因与跟进成本。左胤负责反馈处理流程、分类检索、状态流转、数据沉淀和跨团队协作体验设计，体现 B 端后台、多角色协同和数据闭环能力。',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-05/${index + 1}.mp4`)),
   },
@@ -146,7 +150,8 @@ export const projects = [
     tags: ['0代码', '活动搭建', '组件化'],
     image: assetUrl('project-covers/07.jpg'),
     accent: '#ffffff',
-    category: '创作者与生产力平台',
+    category: 'B端业务平台',
+    recommended: true,
     assistantBrief: '0 代码活动快速搭建是面向运营活动配置的低代码平台项目，解决活动上线依赖研发、配置效率低、重复操作和资产难复用的问题。左胤负责页面搭建、组件化配置、预览发布和复杂规则约束设计，体现 B 端工具、低代码搭建、平台化能力和运营效率设计能力。',
     detailMedia: Array.from({ length: 16 }, (_, index) => assetUrl(`project-06/${index + 1}.mp4`)),
   },
@@ -157,8 +162,9 @@ export const projects = [
     image: assetUrl('project-covers/09.jpg'),
     detailTitle: '降低复杂事件编排的理解与配置成本',
     detailSubtitle: '重点重构事件编排体验，同步优化结果预览与高频配置流程',
-    category: '创作者与生产力平台',
-    categories: ['UX体验设计', '创作者与生产力平台'],
+    category: '桌面客户端',
+    categories: ['UX体验设计', '桌面客户端'],
+    recommended: true,
     detailMedia: Array.from({ length: 7 }, (_, index) => assetUrl(`project-09/${String(index + 1).padStart(2, '0')}.webp`)),
   }),
   {
@@ -170,6 +176,7 @@ export const projects = [
     image: assetUrl('project-covers/10.jpg'),
     accent: '#ffffff',
     category: '个人项目自驱',
+    recommended: true,
     externalUrl: 'https://bikelabfeel.top/',
   },
   createProjectTemplate('11', {
@@ -234,5 +241,14 @@ export const projects = [
     tags: ['UI视觉', '待补充'],
     category: 'C端项目视觉',
     detailTitle: '项目 16\n内容准备中',
+  }),
+  createProjectTemplate('17', {
+    meta: 'DESKTOP CLIENT · COMING SOON',
+    title: '项目 17\n桌面客户端体验设计',
+    description: '项目内容与视觉素材整理中，稍后补充完整的项目背景、设计过程与成果。',
+    tags: ['桌面客户端', '体验设计', '待补充'],
+    category: '桌面客户端',
+    detailTitle: '项目 17\n桌面客户端体验设计',
+    detailSubtitle: '项目详情准备中',
   }),
 ]

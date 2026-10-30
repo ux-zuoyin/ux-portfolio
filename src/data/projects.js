@@ -30,11 +30,11 @@ export const createProjectTemplate = (index, overrides = {}) => {
 export const projects = [
   // 新增项目时复制此调用，并通过第二个参数覆盖标题、封面、标签及详情内容。
   createProjectTemplate('01', {
-    title: '灵魂记忆\nAI动态画像的可信与可控体验设计',
+    title: 'AI动态画像的低负担与可控体验设计',
     description: '围绕信息分级、用户确认、画像生成与展示控制，建立一套用户可理解、可纠错、可管理的动态画像体验',
     tags: ['UX体验设计', 'UI设计', 'AIUX工作流'],
     image: assetUrl('project-covers/01.jpg'),
-    detailTitle: '灵魂记忆\nAI动态画像的可信与可控体验设计',
+    detailTitle: 'AI动态画像的低负担与可控体验设计',
     detailSubtitle: '围绕信息分级、用户确认、画像生成与展示控制，建立一套用户可理解、可纠错、可管理的动态画像体验',
     recommended: true,
     assistantBrief: '灵魂记忆是围绕 Soul 兴趣社交场景设计的 AI 动态画像项目，解决 AI 自动理解用户时可能误判、过度标签化和用户失去控制的问题。左胤负责信息分级、候选记忆确认、画像生成与展示控制等体验设计，体现 AI 信任、用户控制、Agent 边界和复杂系统一致性设计能力。',
